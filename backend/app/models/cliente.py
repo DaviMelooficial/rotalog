@@ -1,9 +1,9 @@
+from ..extensions import db
 from datetime import datetime
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import validates, func
 from validate_docbr import CNPJ, CEP
 
-db = SQLAlchemy()
+
 
 class Cliente(db.Model):
     __tablename__ = 'clientes'

@@ -1,10 +1,9 @@
-from flask_sqlalchemy import SQLAlchemy
+from ..extensions import db
 from sqlalchemy.orm import validates
 from sqlalchemy import ForeignKey
 from datetime import datetime
 from validate_docbr import CNPJ
 
-db = SQLAlchemy()
 
 class Entrega(db.Model):
     __tablename__ = 'entregas'

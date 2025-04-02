@@ -1,7 +1,6 @@
-from flask_sqlalchemy import SQLAlchemy
+from ..extensions import db
 from sqlalchemy import ForeignKey
 
-db = SQLAlchemy()
 
 class Rota(db.Model):
     __tablename__ = 'rotas'
