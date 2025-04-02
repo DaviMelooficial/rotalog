@@ -4,84 +4,99 @@ from ..models import cliente
 from validate_docbr import CNPJ, CEP  
 from app import app
 
-@app.route('/clientes', methods=['POST'])  #FUNÇÃO DE CADASTRO.
-def cadastrar_cliente():  
-    try:  
-        dados = request.get_json()  
+from ..models import Cliente
+from validate_docbr import CNPJ, CEP
+from ..extensions import db
 
-        # Validações iniciais  
-        if not dados.get('cnpj') or not dados.get('email'):  
-            return jsonify({"erro": "CNPJ e e-mail são obrigatórios"}), 400  
-
-        if not CNPJ().validate(dados['cnpj']):  
-            return jsonify({"erro": "CNPJ inválido"}), 400  
-
-        if not CEP().validate(dados['cep']):  
-            return jsonify({"erro": "CEP inválido"}), 400  
-        
-        # Verifica se CNPJ já existe
-        cliente_existente = cliente.query.filter_by(cnpj=dados['cnpj']).first()
-        if cliente_existente:
-            return jsonify({
-                "erro": "CNPJ já cadastrado",
-                "id_existente": cliente_existente.id,
-                "razao_social_existente": cliente_existente.razao_social
-            }), 409  # HTTP 409 Conflict
-
-        # Cria o cliente  
-        novo_cliente = cliente(  
-            cnpj=dados['cnpj'],  
-            razao_social=dados['razao_social'],  
-            nome_fantasia=dados.get('nome_fantasia'),  
-            email=dados['email'],  
-            telefone=dados['telefone'],  
-            logradouro=dados['logradouro'],  
-            bairro=dados['bairro'],  
-            cidade=dados['cidade'],  
-            estado=dados['estado'],  
-            cep=dados['cep'],  
-            inscricao_estadual=dados.get('inscricao_estadual'),  
-            status=True  
-        )  
-
-        db.session.add(novo_cliente)  
-        db.session.commit()  
-
-        return jsonify({  
-            "mensagem": "Cliente cadastrado com sucesso!",  
-            "id": novo_cliente.id  
-        }), 201  
-
-    except Exception as e:  
-        db.session.rollback()  
-        return jsonify({"erro": str(e)}), 500  
+def cadastrar_cliente(dados):#CRIAR NOVO CLIENTE.
+    """
+    Função pura para cadastro de cliente (sem dependências HTTP).
+    Retorna o objeto Cliente em caso de sucesso ou levanta erros específicos.
     
-#______________________________________________________________________________________
+    Args:
+        dados (dict): Dicionário com:
+            - cnpj (str)
+            - razao_social (str)
+            - email (str)
+            - telefone (str)
+            - cep (str)
+            - ... (outros campos do modelo Cliente)
+    
+    Returns:
+        Cliente: Objeto do cliente cadastrado
+    
+    Raises:
+        ValueError: Em caso de dados inválidos ou duplicados
+        Exception: Erros inesperados no banco
+    """
+    # Validações
+    if not all(key in dados for key in ['cnpj', 'email', 'razao_social']):
+        raise ValueError("CNPJ, e-mail e razão social são obrigatórios")
+    
+    if not CNPJ().validate(dados['cnpj']):
+        raise ValueError("CNPJ inválido")
+    
+    if not CEP().validate(dados['cep']):
+        raise ValueError("CEP inválido")
+    
+    # Verifica duplicata
+    if Cliente.query.filter_by(cnpj=dados['cnpj']).first():
+        raise ValueError(f"CNPJ {dados['cnpj']} já cadastrado")
+    
+    # Criação do objeto
+    novo_cliente = Cliente(
+        cnpj=dados['cnpj'],
+        razao_social=dados['razao_social'],
+        nome_fantasia=dados.get('nome_fantasia'),
+        email=dados['email'],
+        telefone=dados['telefone'],
+        logradouro=dados['logradouro'],
+        bairro=dados['bairro'],
+        cidade=dados['cidade'],
+        estado=dados['estado'],
+        cep=dados['cep'],
+        inscricao_estadual=dados.get('inscricao_estadual'),
+        status=True
+    )
+    
+    try:
+        db.session.add(novo_cliente)
+        db.session.commit()
+        return novo_cliente
+    except Exception as e:
+        db.session.rollback()
+        raise Exception(f"Erro ao persistir cliente: {str(e)}")
+    
 
-@app.route('/clientes', methods=['GET'])  #FUNÇÃO DE CONSULTA
-@app.route('/clientes/<int:id>', methods=['GET'])  
-def consultar_clientes(id=None):  
-    try:  
-        if id:  # Consulta específica  
-            cliente = cliente.query.get(id)  
-            if not cliente:  
-                return jsonify({"erro": "Cliente não encontrado"}), 404  
+    
+    
+def consultar_cliente(id=None, cnpj=None):#CONSULTAR BANCO DE DADOS PARA VER CLIENTE.
+    """
+    Consulta cliente por ID ou CNPJ (função pura, sem dependências HTTP).
+    
+    Args:
+        id (int, optional): ID do cliente. Defaults to None.
+        cnpj (str, optional): CNPJ do cliente. Defaults to None.
+    
+    Returns:
+        Cliente: Objeto do cliente encontrado
+    
+    Raises:
+        ValueError: Se nenhum parâmetro for fornecido ou cliente não existir
+    """
+    if not id and not cnpj:
+        raise ValueError("Nenhum critério de busca fornecido (ID ou CNPJ)")
+    
+    cliente = None
+    if id:
+        cliente = Cliente.query.get(id)
+    elif cnpj:
+        cliente = Cliente.query.filter_by(cnpj=cnpj).first()
+    
+    if not cliente:
+        raise ValueError("Cliente não encontrado")
+    
+    return cliente
 
-            return jsonify({  
-                "id": cliente.id,  
-                "razao_social": cliente.razao_social,  
-                "cnpj": cliente.cnpj,  
-                "email": cliente.email,  
-                "status": cliente.status  
-            }), 200  
 
-        else:  # Lista todos (com paginação opcional)  
-            clientes = cliente.query.filter_by(status=True).all()  
-            return jsonify([{  
-                "id": c.id,  
-                "razao_social": c.razao_social,  
-                "cnpj": c.cnpj  
-            } for c in clientes]), 200  
 
-    except Exception as e:  
-        return jsonify({"erro": str(e)}), 500  
