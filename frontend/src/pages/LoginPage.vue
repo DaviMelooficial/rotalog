@@ -9,9 +9,8 @@
       <q-card-section>
         <q-form @submit="handleLogin" class="q-gutter-md">
           <q-input
-            v-model="email"
-            label="E-mail"
-            type="email"
+            v-model="username"
+            label="username"
             outlined
             required
           />
@@ -39,23 +38,41 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'LoginPage',
   data() {
     return {
-      email: '',
+      username: '', // Corrigido de 'email' para 'username'
       password: '',
     };
   },
   methods: {
-    handleLogin() {
-      console.log('E-mail:', this.email);
-      console.log('Senha:', this.password);
-      // Adicione aqui a lógica para autenticação
+    async handleLogin() {
+      try {
+        const response = await axios.post('http://localhost:5000/auth/login', {
+          username: this.username, // Usando 'username'
+          password: this.password,
+        });
+
+        // Exemplo de como lidar com a resposta
+        const { access_token, user } = response.data;
+        console.log('Token de acesso:', access_token);
+        console.log('Usuário:', user);
+
+        // Salve o token no localStorage ou em outro local seguro
+        localStorage.setItem('access_token', access_token);
+
+        // Redirecione o usuário para outra página, se necessário
+        this.$router.push('/dashboard');
+      } catch (error) {
+        console.error('Erro ao fazer login:', error.response?.data || error.message);
+        alert('Erro ao fazer login. Verifique suas credenciais.');
+      }
     },
     forgotPassword() {
       console.log('Redirecionar para recuperação de senha');
-      // Adicione aqui a lógica para recuperação de senha
     },
   },
 };

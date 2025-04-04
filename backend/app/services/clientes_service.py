@@ -1,11 +1,7 @@
 from flask import request, jsonify  
-from ..extensions import db  
-from ..models import cliente
-from validate_docbr import CNPJ, CEP  
-from app import app
-from ..models import Cliente
-from validate_docbr import CNPJ, CEP
 from ..extensions import db
+from validate_docbr import CNPJ
+from ..models.clientes import Cliente
 
 def cadastrar_cliente(dados):#CRIAR NOVO CLIENTE.
     # Validações
@@ -14,9 +10,6 @@ def cadastrar_cliente(dados):#CRIAR NOVO CLIENTE.
     
     if not CNPJ().validate(dados['cnpj']):
         raise ValueError("CNPJ inválido")
-    
-    if not CEP().validate(dados['cep']):
-        raise ValueError("CEP inválido")
     
     # Verifica duplicata
     if Cliente.query.filter_by(cnpj=dados['cnpj']).first():
@@ -46,9 +39,6 @@ def cadastrar_cliente(dados):#CRIAR NOVO CLIENTE.
         db.session.rollback()
         raise Exception(f"Erro ao persistir cliente: {str(e)}")
     
-
-    
-    
 def consultar_cliente(id=None, cnpj=None):#CONSULTAR BANCO DE DADOS PARA VER CLIENTE.
 
     if not id and not cnpj:
@@ -62,9 +52,6 @@ def consultar_cliente(id=None, cnpj=None):#CONSULTAR BANCO DE DADOS PARA VER CLI
         raise ValueError("Cliente não encontrado")
     return cliente
 
-
-
-
 def atualizar_cliente(id, dados): #ATUALIZAR CLIENTE.
     # Busca o cliente
     cliente = Cliente.query.get(id)
@@ -74,9 +61,6 @@ def atualizar_cliente(id, dados): #ATUALIZAR CLIENTE.
     # Validações específicas (se campos forem fornecidos)
     if 'cnpj' in dados and not CNPJ().validate(dados['cnpj']):
         raise ValueError("CNPJ inválido")
-    
-    if 'cep' in dados and not CEP().validate(dados['cep']):
-        raise ValueError("CEP inválido")
 
     # Atualiza campos permitidos (exceto ID e campos calculados)
     campos_permitidos = {
@@ -96,9 +80,6 @@ def atualizar_cliente(id, dados): #ATUALIZAR CLIENTE.
         db.session.rollback()
         raise Exception(f"Falha ao atualizar cliente: {str(e)}")
 
-
-
-
 def deletar_cliente(id):#DELETAR CLIENTE
     cliente = Cliente.query.get(id)
     if not cliente:
@@ -114,5 +95,3 @@ def deletar_cliente(id):#DELETAR CLIENTE
     except Exception as e:
         db.session.rollback()
         raise Exception(f"Falha ao desativar cliente: {str(e)}")
-
-

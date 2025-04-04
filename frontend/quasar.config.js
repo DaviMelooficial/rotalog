@@ -58,7 +58,7 @@ export default defineConfig((/* ctx */) => {
 
       // extendViteConf (viteConf) {},
       // viteVuePluginOptions: {},
-      
+
       vitePlugins: [
         ['vite-plugin-checker', {
           eslint: {
@@ -78,7 +78,19 @@ export default defineConfig((/* ctx */) => {
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#framework
     framework: {
       config: {},
-
+      iconSet: 'material-icons',
+      components: [
+        'QLayout',
+        'QDrawer',
+        'QPageContainer',
+        'QPage',
+        'QScrollArea',
+        'QList',
+        'QItem',
+        'QItemSection',
+        'QItemLabel',
+        'QIcon',
+      ],
       // iconSet: 'material-icons', // Quasar icon set
       // lang: 'en-US', // Quasar language pack
 

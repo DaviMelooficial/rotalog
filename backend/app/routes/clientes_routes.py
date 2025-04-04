@@ -1,11 +1,10 @@
 from flask import Blueprint, request, jsonify
 from ..services.clientes_service import cadastrar_cliente, consultar_cliente, atualizar_cliente, deletar_cliente    
-from ..models import Cliente  # Para a consulta
 
 clientes_bp = Blueprint('clientes', __name__)
 
 #ENDPOINT PARA CADASTRAR CLIENTE
-@clientes_bp.route('/clientes', methods=['POST'])#ENDPOINT PARA CADASTRO.
+@clientes_bp.route('/', methods=['POST'])#ENDPOINT PARA CADASTRO.
 def endpoint_cadastrar_cliente():
 
     try:
@@ -28,10 +27,9 @@ def endpoint_cadastrar_cliente():
     except Exception as e:
         # Erros inesperados (500 Internal Server Error)
         return jsonify({"erro": f"Falha no servidor: {str(e)}"}), 500
-    
 
 #ENDPOINT PARA CONSULTA TANTO COM ID QUANTO COM CNPJ
-@clientes_bp.route('/clientes', methods=['GET'])
+@clientes_bp.route('/', methods=['GET'])
 def endpoint_consultar_cliente():
     id = request.args.get('id', type=int)
     cnpj = request.args.get('cnpj', type=str)
@@ -78,7 +76,7 @@ def endpoint_consultar_cliente_por_cnpj(cnpj):
         return jsonify({"erro": str(e)}), 404'
 '''
 #ENDPOINT PARA ATUALIZAR CLIENTE
-@clientes_bp.route('/clientes/<int:id>', methods=['PUT'])
+@clientes_bp.route('/<int:id>', methods=['PUT'])
 def endpoint_atualizar_cliente(id):
     try:
         dados = request.get_json()
@@ -104,7 +102,7 @@ def endpoint_atualizar_cliente(id):
     
 
 #ENDPOINT PARA DELETAR CLIENTE:
-@clientes_bp.route('/clientes/<int:id>', methods=['DELETE'])
+@clientes_bp.route('/<int:id>', methods=['DELETE'])
 def endpoint_deletar_cliente(id):
     try:
         sucesso = deletar_cliente(id)  # Chama a função de serviço
