@@ -28,6 +28,8 @@ def cadastrar_cliente(dados):#CRIAR NOVO CLIENTE.
         estado=dados['estado'],
         cep=dados['cep'],
         inscricao_estadual=dados.get('inscricao_estadual'),
+        inscricao_municipal=dados.get('inscricao_municipal'),
+        observacoes=dados.get('observacoes'),
         status=True
     )
     
@@ -66,7 +68,7 @@ def atualizar_cliente(id, dados): #ATUALIZAR CLIENTE.
     campos_permitidos = {
         'cnpj', 'razao_social', 'nome_fantasia', 'email',
         'telefone', 'logradouro', 'bairro', 'cidade', 
-        'estado', 'cep', 'inscricao_estadual', 'status'
+        'estado', 'cep', 'inscricao_estadual','inscricao_municipal', 'observacoes', 'status'
     }
     
     for campo, valor in dados.items():

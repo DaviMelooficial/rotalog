@@ -1,8 +1,8 @@
-"""empty message
+"""criando banco
 
-Revision ID: 4e0512247246
+Revision ID: 7c4604c76b3b
 Revises: 
-Create Date: 2025-04-03 12:19:17.472002
+Create Date: 2025-04-04 13:57:19.964318
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '4e0512247246'
+revision = '7c4604c76b3b'
 down_revision = None
 branch_labels = None
 depends_on = None

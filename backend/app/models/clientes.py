@@ -4,6 +4,7 @@ from sqlalchemy.orm import validates
 from sqlalchemy.sql import func
 from validate_docbr import CNPJ
 
+
 class Cliente(db.Model):
     __tablename__ = 'clientes'
     
