@@ -45,36 +45,8 @@ def endpoint_consultar_cliente():
         }), 200
     except ValueError as e:
         return jsonify({"erro": str(e)}), 404
-'''
-# Consulta por ID
-@clientes_bp.route('/clientes/<int:id>', methods=['GET'])
-def endpoint_consultar_cliente_por_id(id):
-    try:
-        cliente = consultar_cliente(id=id)
-        return jsonify({
-            "id": cliente.id,
-            "cnpj": cliente.cnpj,
-            "razao_social": cliente.razao_social,
-            "email": cliente.email
-        }), 200
-    except ValueError as e:
-        return jsonify({"erro": str(e)}), 404
 
 
-
-# Consulta por CNPJ
-@clientes_bp.route('/clientes/cnpj/<string:cnpj>', methods=['GET'])
-def endpoint_consultar_cliente_por_cnpj(cnpj):
-    try:
-        cliente = consultar_cliente(cnpj=cnpj)
-        return jsonify({
-            "id": cliente.id,
-            "cnpj": cliente.cnpj,
-            "nome_fantasia": cliente.nome_fantasia
-        }), 200
-    except ValueError as e:
-        return jsonify({"erro": str(e)}), 404'
-'''
 #ENDPOINT PARA ATUALIZAR CLIENTE
 @clientes_bp.route('/<int:id>', methods=['PUT'])
 def endpoint_atualizar_cliente(id):
