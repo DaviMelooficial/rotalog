@@ -9,7 +9,7 @@ def create_app(config_name='development'):
     # Configuração CORS aprimorada
     cors = CORS(app, resources={
         r"/auth/*": {
-            "origins": ["http://localhost:9000", "http://localhost:8080"],
+            "origins": ["http://localhost:5173", "http://localhost:8080"],
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
             "supports_credentials": True
@@ -30,7 +30,7 @@ def create_app(config_name='development'):
         if request.method == "OPTIONS":
             response = make_response()
             response.headers.add("Access-Control-Allow-Origin", 
-                               app.config.get("CORS_ORIGIN", "http://localhost:9000"))
+                               app.config.get("CORS_ORIGIN", "http://localhost:5173"))
             response.headers.add("Access-Control-Allow-Headers", 
                                "Content-Type, Authorization")
             response.headers.add("Access-Control-Allow-Methods", 
