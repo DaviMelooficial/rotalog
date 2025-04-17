@@ -1,5 +1,4 @@
 from ..extensions import db
-from ..extensions import ForeignKey
 from datetime import datetime
 
 class Rota(db.Model):
@@ -11,8 +10,8 @@ class Rota(db.Model):
     ENTREGAS = db.Column(db.String(255), nullable=False)  # Ex: Entrega 1, Entrega 2, etc.
     #PREVISAO_ENTREGAS = db.Column(db.Date, nullable=False)  # Data prevista para as entregas
     STATUS = db.Column(db.String(20), nullable=False, default='planejada')  # Ex: Em planejamento, planejada, em_transporte, concluída
-    MOTORISTA = db.Column(db.Integer, ForeignKey('motoristas.nome_motorista'), nullable=True)  # Se houver tabela Motorista
-    VEICULO_ID = db.Column(db.Integer, ForeignKey('veiculos.ID_VEICULO'), nullable=True)  # Se houver tabela Veículo
+    MOTORISTA = db.Column(db.Integer, db.ForeignKey('motoristas.nome_motorista'), nullable=True)  # Se houver tabela Motorista
+    VEICULO_ID = db.Column(db.Integer, db.ForeignKey('veiculos.ID_VEICULO'), nullable=True)  # Se houver tabela Veículo
     OBSERVACOES = db.Column(db.Text)
 
 

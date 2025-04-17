@@ -1,4 +1,5 @@
-from ..models import Entrega, Cliente
+from ..models.entregas import Entrega
+from ..models.clientes import Cliente
 from ..extensions import db
 from datetime import datetime
 
@@ -9,8 +10,12 @@ def cadastrar_entrega(dados):
     
     nova_entrega = Entrega(
         cnpj_cliente=dados['cnpj_cliente'],
-        nota_fiscal=dados['nota_fisca'],
-        endereco_endrega=dados['endereco_endrega'],
+        nota_fiscal=dados['nota_fiscal'],
+        logradouro_entrega=dados['logradouro_entrega'],
+        bairro_entrega=dados['bairro_entrega'],
+        cidade_entrega=dados['cidade_entrega'],
+        estado_entrega=dados['estado_entrega'],
+        cep_entrega=dados['cep_entrega'],
         volume=dados['volume'],
         data_entrega=datetime.strptime(dados['data_entrega'], '%Y-%m-%d')
     )

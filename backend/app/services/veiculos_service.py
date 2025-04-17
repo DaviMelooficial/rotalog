@@ -1,10 +1,9 @@
 from ..extensions import db
-from ..models import Veiculo
-from ..extensions import datetime
+from ..models.veiculos import Veiculo
 
 
 #CADASTRAR VEÍCULO
-def cadastrar_veiculos(dados_veiculo):
+def cadastrar_veiculos(dados_veiculo): 
     if Veiculo.query.filter_by(PLACA=dados_veiculo['placa']).first():
         raise ValueError("Veículo já cadastrado")
     

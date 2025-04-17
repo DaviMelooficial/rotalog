@@ -1,11 +1,11 @@
 from ..extensions import Blueprint,request, jsonify
 from ..services.entregas_service import cadastrar_entrega, consultar_entrega, atualizar_entrega, cancelar_entrega
 
-entregas_bp = Blueprint('clientes', __name__)
+entregas_bp = Blueprint('entregas', __name__)
 
 
-
-@entregas_bp.route('/entregas', methods=['POST'])#CRIAR ENTREGAS
+#CADASTRAR ENTREGAS
+@entregas_bp.route('/cadastrar_entrega', methods=['POST'])
 def cadastrar_entrega_endpoint():
     try:
         dados = request.get_json()
