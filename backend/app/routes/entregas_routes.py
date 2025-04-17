@@ -3,8 +3,6 @@ from  ..services.entregas_service import cadastrar_entrega, consultar_entrega, a
 
 entregas_bp = Blueprint('clientes', __name__)
 
-
-
 @entregas_bp.route('/entregas', methods=['POST'])#CRIAR ENTREGAS
 def cadastrar_entrega_endpoint():
     try:
