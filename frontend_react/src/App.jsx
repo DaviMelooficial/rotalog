@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./Login";
 import Home from "./Home";
+import Cadastros from "./Cadastros"; // Importa o componente de Cadastros
 
 function App() {
   const isAuthenticated = !!localStorage.getItem("token");
@@ -16,6 +17,12 @@ function App() {
         <Route
           path="/home"
           element={isAuthenticated ? <Home /> : <Navigate to="/login" />}
+        />
+
+        {/* Rota de Cadastros (protegida) */}
+        <Route
+          path="/cadastros"
+          element={isAuthenticated ? <Cadastros /> : <Navigate to="/login" />}
         />
 
         {/* Redireciona para /login por padrão */}

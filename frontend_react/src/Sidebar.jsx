@@ -9,7 +9,7 @@ import {
   faChartLine,
   faCogs,
   faSignOutAlt,
-  faClipboardList,
+  faUsers, // Ícone para Cadastros
 } from "@fortawesome/free-solid-svg-icons";
 import "./Sidebar.css";
 
@@ -46,13 +46,13 @@ const Sidebar = () => {
           Criar rotas
         </NavLink>
         <NavLink
-          to="/register"
+          to="/cadastros" // Adiciona a rota para Cadastros
           className={({ isActive }) =>
             isActive ? "sidebar-link active" : "sidebar-link"
           }
         >
-          <FontAwesomeIcon icon={faClipboardList} className="sidebar-icon" />
-          Cadastro
+          <FontAwesomeIcon icon={faUsers} className="sidebar-icon" />
+          Cadastros
         </NavLink>
         <NavLink
           to="/reports"

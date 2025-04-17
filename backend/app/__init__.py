@@ -49,7 +49,6 @@ def create_app(config_name='development'):
     from .routes.entregas_routes import entregas_bp
     app.register_blueprint(entregas_bp, url_prefix='/entregas')
 
-
     # Error handler global
     @app.errorhandler(500)
     def handle_server_error(e):
