@@ -1,5 +1,5 @@
-from flask import Blueprint, request, jsonify
-from  ..services.entregas_service import cadastrar_entrega, consultar_entrega, atualizar_entrega, cancelar_entrega
+from ..extensions import Blueprint,request, jsonify
+from ..services.entregas_service import cadastrar_entrega, consultar_entrega, atualizar_entrega, cancelar_entrega
 
 entregas_bp = Blueprint('clientes', __name__)
 
