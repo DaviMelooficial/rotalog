@@ -22,7 +22,7 @@ class Cliente(db.Model):
     inscricao_estadual = db.Column(db.String(20))
     inscricao_municipal = db.Column(db.String(20))
     data_atualizacao = db.Column(db.DateTime, onupdate=func.now())
-    status = db.Column(db.Boolean, default=True)
+    status = db.Column(db.String(15), default=True)#ATIVO OU INATIVO
     observacoes = db.Column(db.Text)
 
     # Validação de CNPJ

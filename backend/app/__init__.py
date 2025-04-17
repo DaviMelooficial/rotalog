@@ -42,6 +42,13 @@ def create_app(config_name='development'):
     app.register_blueprint(auth_bp, url_prefix='/auth')
     from .routes.clientes_routes import clientes_bp
     app.register_blueprint(clientes_bp, url_prefix='/clientes')
+    from .routes.veiculos_routes import veiculos_bp
+    app.register_blueprint(veiculos_bp, url_prefix='/veiculos')
+    from .routes.motorista_routes import motoristas_bp
+    app.register_blueprint(motoristas_bp, url_prefix='/motoristas')
+    from .routes.entregas_routes import entregas_bp
+    app.register_blueprint(entregas_bp, url_prefix='/entregas')
+
 
     # Error handler global
     @app.errorhandler(500)

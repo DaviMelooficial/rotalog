@@ -1,10 +1,10 @@
 from flask import Blueprint, request, jsonify
-from ..services.clientes_service import cadastrar_cliente, consultar_cliente, atualizar_cliente, deletar_cliente    
+from ..services.clientes_service import cadastrar_cliente, consultar_cliente, atualizar_cliente, desativar_cliente    
 
 clientes_bp = Blueprint('clientes', __name__)
 
 #ENDPOINT PARA CADASTRAR CLIENTE
-@clientes_bp.route('/', methods=['POST'])#ENDPOINT PARA CADASTRO.
+@clientes_bp.route('/cadastrar_cliente', methods=['POST'])#ENDPOINT PARA CADASTRO.
 def endpoint_cadastrar_cliente():
 
     try:
@@ -28,28 +28,26 @@ def endpoint_cadastrar_cliente():
         # Erros inesperados (500 Internal Server Error)
         return jsonify({"erro": f"Falha no servidor: {str(e)}"}), 500
 
-#ENDPOINT PARA CONSULTA TANTO COM ID QUANTO COM CNPJ
-@clientes_bp.route('/', methods=['GET'])
-def endpoint_consultar_cliente():
-    id = request.args.get('id', type=int)
-    cnpj = request.args.get('cnpj', type=str)
-
+#ENDPOINT PARA CONSULTA COM CNPJ
+@clientes_bp.route('/consultar_cliente/<string:cnpj>', methods=['GET'])
+def endpoint_consultar_cliente(cnpj):
     try:
-        cliente = consultar_cliente(id=id, cnpj=cnpj)
+        cliente = consultar_cliente(cnpj=cnpj)
         return jsonify({
             "id": cliente.id,
             "cnpj": cliente.cnpj,
             "razao_social": cliente.razao_social,
             "nome_fantasia": getattr(cliente, "nome_fantasia", None),
+            "status": cliente.status,
+            "telefone": cliente.telefone,
             "email": getattr(cliente, "email", None)
         }), 200
     except ValueError as e:
         return jsonify({"erro": str(e)}), 404
 
-
 #ENDPOINT PARA ATUALIZAR CLIENTE
-@clientes_bp.route('/<int:id>', methods=['PUT'])
-def endpoint_atualizar_cliente(id):
+@clientes_bp.route('/atualizar_cliente/<string:cnpj>', methods=['PUT'])
+def endpoint_atualizar_cliente(cnpj):
     try:
         dados = request.get_json()
 
@@ -57,12 +55,12 @@ def endpoint_atualizar_cliente(id):
             return jsonify({"erro": "Nenhum dado fornecido para atualização"}), 400
 
         # Chama a função de serviço
-        cliente_atualizado = atualizar_cliente(id, dados)
+        cliente_atualizado = atualizar_cliente(cnpj, dados)
 
         # Resposta com os campos atualizados
         return jsonify({
             "mensagem": "Cliente atualizado com sucesso",
-            "id": cliente_atualizado.id,
+            "cnpj": cliente_atualizado.cnpj,
             "campos_alterados": list(dados.keys())
         }), 200
 
@@ -70,24 +68,20 @@ def endpoint_atualizar_cliente(id):
         return jsonify({"erro": str(e)}), 404  # Cliente não encontrado ou dados inválidos
 
     except Exception as e:
-        return jsonify({"erro": f"Falha na atualização: {str(e)}"}), 500
+        return jsonify({"erro": f"Falha na atualização: {str(e)}"}),     500
     
 
-#ENDPOINT PARA DELETAR CLIENTE:
-@clientes_bp.route('/<int:id>', methods=['DELETE'])
-def endpoint_deletar_cliente(id):
+#ENDPOINT PARA DESATIVAR CLIENTE:
+@clientes_bp.route('/desativar_cliente/<string:cnpj>', methods=['PATCH'])
+def endpoint_desativar_cliente(cnpj):
     try:
-        sucesso = deletar_cliente(id)  # Chama a função de serviço
-        
-        if sucesso:
-            return jsonify({
-                "mensagem": "Cliente desativado com sucesso",
-                "id": id,
-                "status": "inativo"
-            }), 200
-    
+        cliente = desativar_cliente(cnpj)  # Chama a função para desativar o cliente
+        return jsonify({
+            "mensagem": f"Cliente {cliente.razao_social} desativado com sucesso.",
+            "cnpj": cliente.cnpj,
+            "status": cliente.status
+        }), 200  # Retorna o cliente com o status e cadastro travado
     except ValueError as e:
-        return jsonify({"erro": str(e)}), 404  # Cliente não encontrado ou já inativo
-    
+        return jsonify({"erro": str(e)}), 400  # Retorna erro se cliente não encontrado ou já inativo
     except Exception as e:
-        return jsonify({"erro": f"Falha ao desativar cliente: {str(e)}"}), 500
+        return jsonify({"erro": str(e)}), 500  # Retorna erro genérico se houver falha no processo
