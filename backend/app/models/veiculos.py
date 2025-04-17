@@ -1,6 +1,6 @@
 from ..extensions import db
 
-class Veículo(db.Model):
+class Veiculo(db.Model):
     __tablename__ = 'veiculos'
 
     ID_VEICULO = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -10,11 +10,11 @@ class Veículo(db.Model):
     COR = db.Column(db.String(20), nullable=False)  # Ex: Azul, Branco, Preto, etc.
     ANO_FABRICACAO = db.Column(db.Integer, nullable=False)
     RENAVAM = db.Column(db.String(11), unique=True, nullable=False, index=True)
-    CHASSI = db.Colummn(db.String(20), unique=True, nullable=False, index=True)
+    CHASSI = db.Column(db.String(20), unique=True, nullable=False, index=True)
     TIPO_CARROCERIA = db.Column(db.String(50), nullable=False)  # Ex: refrigerado, alumínio, lonado, 3/4(3Ton), etc.
     CAPACIDADE_CARGA = db.Column(db.Float, nullable=False)  # Capacidade de carga em toneladas
     STATUS = db.Column(db.String(20), nullable=False)  # Ex: Disponível, Em uso, Manutenção, Cancelado
-    ID_ROTA = db.Column(db.Integer, db.ForeignKey('rotas.ID_ROTA'), nullable=True)  # FK para a tabela de rotas será atualizado de acordo com o uso.
+    #ID_ROTA = db.Column(db.Integer, db.ForeignKey('rotas.ID_ROTA'), nullable=True)  # FK para a tabela de rotas será atualizado de acordo com o uso.
 
 
     def __repr__(self):         

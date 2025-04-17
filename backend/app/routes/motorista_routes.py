@@ -4,7 +4,7 @@ from ..services.motoristas_service import cadastrar_motorista, consultar_motoris
 motoristas_bp = Blueprint('motoristas', __name__)
 
 
-@motoristas_bp.route('/motoristas', methods=['POST']) #CRIAR MOTORISTA
+@motoristas_bp.route('/cadastrar_motorista', methods=['POST']) #CRIAR MOTORISTA
 def cadastrar_motorista_endpoint():
     try:
         dados = request.get_json()
@@ -27,7 +27,7 @@ def cadastrar_motorista_endpoint():
         return jsonify({"erro": f"Falha no servidor: {str(e)}"}), 500
     
 
-@motoristas_bp.route('/motoristas', methods=['GET']) #CONSULTAR MOTORISTA
+@motoristas_bp.route('/consultar_motorista', methods=['GET']) #CONSULTAR MOTORISTA
 def consultar_motorista_endpoint():
     try:    
         id_motorista = request.args.get('id_motorista')
@@ -53,9 +53,9 @@ def consultar_motorista_endpoint():
         return jsonify({"erro": str(e)}), 400
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
-    
+   
 
-@motoristas_bp.route('/motoristas/<int:id_motorista>', methods=['PUT']) #ATUALIZAR MOTORISTA
+@motoristas_bp.route('/atualizar_motoristas/<int:id_motorista>', methods=['PUT']) #ATUALIZAR MOTORISTA
 def atualizar_motorista_endpoint(id_motorista):
     try:
         dados = request.get_json()

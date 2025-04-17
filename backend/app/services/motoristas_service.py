@@ -1,6 +1,5 @@
 from ..extensions import db
-from ..models import Motorista
-from datetime import datetime
+from ..models.motoristas import Motorista
 
 #CADASTRAR MOTORISTA:
 def cadastrar_motorista(dados):

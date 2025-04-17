@@ -3,7 +3,8 @@ from ..extensions import db
 from validate_docbr import CNPJ
 from ..models.clientes import Cliente
 
-def cadastrar_cliente(dados):#CRIAR NOVO CLIENTE.
+
+def cadastrar_cliente(dados):
     # Validações
     if not all(key in dados for key in ['cnpj', 'email', 'razao_social']):
         raise ValueError("CNPJ, e-mail e razão social são obrigatórios")
@@ -30,7 +31,7 @@ def cadastrar_cliente(dados):#CRIAR NOVO CLIENTE.
         inscricao_estadual=dados.get('inscricao_estadual'),
         inscricao_municipal=dados.get('inscricao_municipal'),
         observacoes=dados.get('observacoes'),
-        status=True
+        status="ATIVO"
     )
     
     try:
@@ -41,22 +42,20 @@ def cadastrar_cliente(dados):#CRIAR NOVO CLIENTE.
         db.session.rollback()
         raise Exception(f"Erro ao persistir cliente: {str(e)}")
     
-def consultar_cliente(id=None, cnpj=None):#CONSULTAR BANCO DE DADOS PARA VER CLIENTE.
+def consultar_cliente(cnpj):
+    if not cnpj:
+        raise ValueError("CNPJ não fornecido")
 
-    if not id and not cnpj:
-        raise ValueError("Nenhum critério de busca fornecido (ID ou CNPJ)")
-    cliente = None
-    if id:
-        cliente = Cliente.query.get(id)
-    elif cnpj:
-        cliente = Cliente.query.filter_by(cnpj=cnpj).first()
+    cliente = Cliente.query.filter_by(cnpj=cnpj).first()
+
     if not cliente:
         raise ValueError("Cliente não encontrado")
+
     return cliente
 
-def atualizar_cliente(id, dados): #ATUALIZAR CLIENTE.
+def atualizar_cliente(cnpj, dados):
     # Busca o cliente
-    cliente = Cliente.query.get(id)
+    cliente = Cliente.query.filter_by(cnpj=cnpj).first()
     if not cliente:
         raise ValueError("Cliente não encontrado")
 
@@ -82,18 +81,21 @@ def atualizar_cliente(id, dados): #ATUALIZAR CLIENTE.
         db.session.rollback()
         raise Exception(f"Falha ao atualizar cliente: {str(e)}")
 
-def deletar_cliente(id):#DELETAR CLIENTE
-    cliente = Cliente.query.get(id)
+def desativar_cliente(cnpj):
+    cliente = Cliente.query.filter_by(cnpj=cnpj).first()
     if not cliente:
         raise ValueError("Cliente não encontrado")
 
-    if not cliente.status:
+    # Verifica se o cliente já está inativo (status False)
+    if  cliente.status == "INATIVO":
         raise ValueError("Cliente já está inativo")
 
+    cliente.status ="INATIVO"  # Exclusão lógica (cliente inativo)
+    #criar bloco para que ele seja impossibilitado de ser usado em formação de rotas.
+
     try:
-        cliente.status = False  # Exclusão lógica
-        db.session.commit()
-        return True
+        db.session.commit()  # Persiste as alterações no banco
+        return cliente  # Retorna o cliente com as alterações feitas
     except Exception as e:
-        db.session.rollback()
+        db.session.rollback()  # Desfaz as alterações caso ocorra erro
         raise Exception(f"Falha ao desativar cliente: {str(e)}")
