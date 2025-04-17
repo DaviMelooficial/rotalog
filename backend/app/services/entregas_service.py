@@ -1,4 +1,4 @@
-from ..models import Entrega, Cliente, Rota
+from ..models import Entrega, Cliente
 from ..extensions import db
 from datetime import datetime
 
