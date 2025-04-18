@@ -5,8 +5,12 @@ from datetime import datetime
 
 #CADASTRO DE ENTREGA:
 def cadastrar_entrega(dados):
-    if not Cliente.query.filter_by(cnpj=dados['cnpj_cliente']).first(): #verificação de existencia do cliente.
+    
+    if not Cliente.query.filter_by(cnpj=dados['cnpj_cliente']).first():
         raise ValueError("Cliente não encontrado")
+    
+    if Entrega.query.filter_by(nota_fiscal=dados['nota_fiscal']).first():
+        raise ValueError(f"Nota fiscal {dados['nota_fiscal']} já cadastrada")
     
     nova_entrega = Entrega(
         cnpj_cliente=dados['cnpj_cliente'],
@@ -24,33 +28,57 @@ def cadastrar_entrega(dados):
     return nova_entrega
 
 #CONSULTA DE ENTREGA:
-def consultar_entrega(id_entrega=None, nota_fiscal=None):
-    if id_entrega:
-        return Entrega.query.get(id_entrega)
-    elif nota_fiscal:
-        return Entrega.query.filter_by(NOTA_FISCAL=nota_fiscal).first()
-    raise ValueError("Nenhum critério de busca fornecido")
+def consultar_entrega(nota_fiscal):
+    if not nota_fiscal:
+        raise ValueError("Nota fiscal não fornecida")
+    
+    # Consulta pelo número da nota fiscal
+    entrega = Entrega.query.filter_by(nota_fiscal=nota_fiscal).first()
+    if not entrega:
+        raise ValueError("Entrega não encontrada para a nota fiscal fornecida")
+    
+    return entrega
 
 #ATUALIZAR CADASTRO:
-def atualizar_entrega(id_entrega, dados):#RECEBE OS PARAMETROS AO LADO, ID_ENTREGA PARA INDENTIFICAR E DADOS PARA ATUALIZAR A TABELA DADOS.
-    entrega = Entrega.query.get(id_entrega)
+def atualizar_entrega(nota_fiscal, dados):
+    entrega = Entrega.query.filter_by(nota_fiscal=nota_fiscal).first()
     if not entrega:
-        raise ValueError("Entrega não encontrada")
+        raise ValueError("Entrega não encontrada para NF fornecida")
     
-    campos_permitidos = ['endereco_entrega', 'volume', 'data_entrega', 'rota']
+    campos_permitidos = [
+        'logradouro_entrega',
+        'bairro_entrega',
+        'cidade_entrega',
+        'estado_entrega',
+        'cep_entrega',
+        'volume',
+        'data_entrega',
+        ]
     for campo, valor in dados.items():
         if campo in campos_permitidos:
+            if campo == 'data_entrega' and isinstance(valor, str):
+                valor = datetime.strptime(valor, '%Y-%m-%d')
             setattr(entrega, campo, valor)
     db.session.commit()
     return entrega
 
 # DELETE (Lógico)
-def cancelar_entrega(id_entrega):
-    """Remove a vinculação com a rota (ROTA=NULL) em vez de apagar."""
-    entrega = Entrega.query.get(id_entrega)
+def cancelar_entrega(nota_fiscal):
+    """Cancela a entrega alterando o status para 'Cancelada'."""
+    entrega = Entrega.query.filter_by(nota_fiscal=nota_fiscal).first()
     if not entrega:
-        raise ValueError("Entrega não encontrada")
+        raise ValueError("Entrega não encontrada para a nota fiscal fornecida")
     
-    entrega.ROTA = None  # Desvincula da rota sem excluir
-    db.session.commit()
-    return True
+    # Verifica se a entrega já está cancelada
+    if entrega.status_entrega == "CANCELADA":
+        raise ValueError("A entrega já está cancelada")
+    
+    # Atualiza o status para "Cancelada"
+    entrega.status_entrega = "Cancelada"
+    
+    try:
+        db.session.commit()
+        return entrega
+    except Exception as e:
+        db.session.rollback()
+        raise Exception(f"Erro ao cancelar entrega: {str(e)}")

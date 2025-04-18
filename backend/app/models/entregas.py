@@ -16,6 +16,7 @@ class Entrega(db.Model):
     cep_entrega = db.Column(db.String(8), nullable=False)
     volume = db.Column(db.Float, nullable=False)
     data_entrega = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    status_entrega = db.Column(db.String(20), default='Pendente', nullable=False)  # Status da entrega (Pendente, Entregue, Cancelada)
     # ID_ROTA = db.Column(db.Integer, db.ForeignKey('rotas.ID_ROTA'), nullable=True)  # Chave estrangeira (se a tabela Rota existir)
                     
     def __repr__(self):

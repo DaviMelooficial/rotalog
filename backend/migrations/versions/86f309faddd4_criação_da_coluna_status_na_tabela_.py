@@ -1,8 +1,8 @@
-"""empty message
+"""Criação da coluna status na tabela entrega
 
-Revision ID: ce7fdc516a30
+Revision ID: 86f309faddd4
 Revises: 
-Create Date: 2025-04-17 14:51:43.074167
+Create Date: 2025-04-18 14:44:55.315537
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ce7fdc516a30'
+revision = '86f309faddd4'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -33,7 +33,7 @@ def upgrade():
     sa.Column('inscricao_estadual', sa.String(length=20), nullable=True),
     sa.Column('inscricao_municipal', sa.String(length=20), nullable=True),
     sa.Column('data_atualizacao', sa.DateTime(), nullable=True),
-    sa.Column('status', sa.Boolean(), nullable=True),
+    sa.Column('status', sa.String(length=15), nullable=True),
     sa.Column('observacoes', sa.Text(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
@@ -93,6 +93,7 @@ def upgrade():
     sa.Column('cep_entrega', sa.String(length=8), nullable=False),
     sa.Column('volume', sa.Float(), nullable=False),
     sa.Column('data_entrega', sa.DateTime(), nullable=False),
+    sa.Column('status_entrega', sa.String(length=20), nullable=False),
     sa.ForeignKeyConstraint(['cnpj_cliente'], ['clientes.cnpj'], ),
     sa.PrimaryKeyConstraint('id_entrega'),
     sa.UniqueConstraint('nota_fiscal')
