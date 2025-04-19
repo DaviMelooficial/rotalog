@@ -4,7 +4,7 @@ from ..services.clientes_service import cadastrar_cliente, consultar_cliente, at
 clientes_bp = Blueprint('clientes', __name__)
 
 #ENDPOINT PARA CADASTRAR CLIENTE
-@clientes_bp.route('/cadastrar_cliente', methods=['POST'])#ENDPOINT PARA CADASTRO.
+@clientes_bp.route('/cadastrar_cliente', methods=['POST'])
 def endpoint_cadastrar_cliente():
 
     try:

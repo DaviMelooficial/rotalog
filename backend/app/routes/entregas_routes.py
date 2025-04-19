@@ -18,8 +18,8 @@ def cadastrar_entrega_endpoint():
         
         return jsonify({
             "mensagem": "Entrega cadastrada com sucesso",
-            "id_entrega": entrega.ID_ENTREGA,
-            "nota_fiscal": entrega.NOTA_FISCAL
+            "id_entrega": entrega.id_entrega,
+            "nota_fiscal": entrega.nota_fiscal
         }), 201
 
     except ValueError as e:
@@ -28,44 +28,50 @@ def cadastrar_entrega_endpoint():
         return jsonify({"erro": f"Falha no servidor: {str(e)}"}), 500
     
 
-
-@entregas_bp.route('/entregas', methods=['GET'])#CONSULTAR ENTREGAS
+#CONSULTAR ENTREGAS
+@entregas_bp.route('/consultar_entrega', methods=['GET'])  
 def consultar_entrega_endpoint():
     try:
-        id_entrega = request.args.get('id')
+        # Obtém a nota fiscal da requisição
         nota_fiscal = request.args.get('nota_fiscal')
 
-        entrega = consultar_entrega(
-            id_entrega=int(id_entrega) if id_entrega else None,
-            nota_fiscal=nota_fiscal
-        )
+        if not nota_fiscal:
+            return jsonify({"erro": "Nota fiscal não fornecida"}), 400
 
-        if not entrega:
-            return jsonify({"erro": "Entrega não encontrada"}), 404
+        # Consulta a entrega pelo número da nota fiscal
+        entrega = consultar_entrega(nota_fiscal)
 
+        # Retorna os dados da entrega
         return jsonify({
-            "id": entrega.ID_ENTREGA,
-            "cnpj_cliente": entrega.CNPJ_CLIENTE,
-            "nota_fiscal": entrega.NOTA_FISCAL,
-            "status": "Vinculada" if entrega.ROTA else "Pendente"
+            "id": entrega.id_entrega,
+            "cnpj_cliente": entrega.cnpj_cliente,
+            "nota_fiscal": entrega.nota_fiscal,
+            "logradouro_entrega": entrega.logradouro_entrega,
+            "bairro_entrega": entrega.bairro_entrega,
+            "cidade_entrega": entrega.cidade_entrega,
+            "estado_entrega": entrega.estado_entrega,
+            "cep_entrega": entrega.cep_entrega,
+            "volume": entrega.volume,
+            "data_entrega": entrega.data_entrega.strftime('%Y-%m-%d'),
+            "status": "Vinculada" if hasattr(entrega, "ROTA") and entrega.ROTA else "Pendente"
         }), 200
 
     except ValueError as e:
-        return jsonify({"erro": str(e)}), 400
+        return jsonify({"erro": str(e)}), 404  # Entrega não encontrada
     except Exception as e:
-        return jsonify({"erro": str(e)}), 500
-    
+        return jsonify({"erro": f"Falha no servidor: {str(e)}"}), 500    
 
 
-@entregas_bp.route('/entregas/<int:id_entrega>', methods=['PUT'])#ATUALIZAR ENTREGAS
-def atualizar_entrega_endpoint(id_entrega):
+#ATUALIZAR ENTREGAS
+@entregas_bp.route('/atualizar_entrega/<string:nota_fiscal>', methods=['PUT'])
+def atualizar_entrega_endpoint(nota_fiscal):
     try:
         dados = request.get_json()
         
         if not dados:
             return jsonify({"erro": "Nenhum dado fornecido"}), 400
 
-        entrega = atualizar_entrega(id_entrega, dados)
+        entrega = atualizar_entrega(nota_fiscal, dados)
         
         return jsonify({
             "mensagem": "Entrega atualizada",
@@ -79,18 +85,16 @@ def atualizar_entrega_endpoint(id_entrega):
     
 
 
-@entregas_bp.route('/entregas/<int:id_entrega>', methods=['DELETE'])
-def cancelar_entrega_endpoint(id_entrega):
+@entregas_bp.route('/cancelar_entrega/<string:nota_fiscal>', methods=['PATCH'])
+def cancelar_entrega_endpoint(nota_fiscal):
     try:
-        sucesso = cancelar_entrega(id_entrega)
-        
-        if sucesso:
-            return jsonify({
-                "mensagem": "Entrega desvinculada da rota",
-                "id_entrega": id_entrega
-            }), 200
-
+        entrega = cancelar_entrega(nota_fiscal)
+        return jsonify({
+            "mensagem": "Entrega cancelada com sucesso",
+            "nota_fiscal": entrega.nota_fiscal,
+            "status": entrega.status_entrega
+        }), 200
     except ValueError as e:
-        return jsonify({"erro": str(e)}), 404
+        return jsonify({"erro": str(e)}), 400
     except Exception as e:
-        return jsonify({"erro": str(e)}), 500    
+        return jsonify({"erro": f"Falha no servidor: {str(e)}"}), 500   
