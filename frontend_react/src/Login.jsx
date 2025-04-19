@@ -12,15 +12,15 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
+  
     try {
       const response = await axios.post("http://localhost:5000/auth/login", {
         username,
         password,
       });
-
-      const { access_token, user } = response.data;
-
+  
+      const { access_token } = response.data;
+  
       // Salva o token no localStorage
       localStorage.setItem("token", access_token);
 

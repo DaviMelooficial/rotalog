@@ -3,7 +3,6 @@ from ..extensions import db
 from validate_docbr import CNPJ
 from ..models.clientes import Cliente
 
-
 def cadastrar_cliente(dados):
     # Validações
     if not all(key in dados for key in ['cnpj', 'email', 'razao_social']):
@@ -52,6 +51,9 @@ def consultar_cliente(cnpj):
         raise ValueError("Cliente não encontrado")
 
     return cliente
+
+def listar_clientes():
+    return Cliente.query.all()
 
 def atualizar_cliente(cnpj, dados):
     # Busca o cliente

@@ -15,6 +15,8 @@ const Cadastros = () => {
   const [mensagem, setMensagem] = useState("");
   const [clientes, setClientes] = useState([]);
   const [pesquisa, setPesquisa] = useState("");
+  const [cnpjConsulta, setCnpjConsulta] = useState("");
+  const [clienteConsultado, setClienteConsultado] = useState(null);
 
   useEffect(() => {
     if (tipoCadastro === "clientes") {
@@ -27,10 +29,22 @@ const Cadastros = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  // Função para consultar cliente pelo CNPJ
+  const consultarCliente = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/clientes/consultar_cliente/${cnpjConsulta}`);
+      setClienteConsultado(response.data); // Armazena os dados do cliente consultado
+      setMensagem(""); // Limpa mensagens de erro
+    } catch (error) {
+      setClienteConsultado(null); // Limpa os dados do cliente consultado
+      setMensagem(error.response?.data?.erro || "Erro ao consultar cliente.");
+    }
+  };
+  
   const cadastrarCliente = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/cadastrar_cliente",
+        "http://localhost:5000/clientes/cadastrar_cliente",
         formData
       );
       setMensagem(response.data.mensagem);
@@ -50,7 +64,7 @@ const Cadastros = () => {
   const listarClientes = async () => {
     try {
       // Simulação de listagem de clientes
-      const response = await axios.get("http://localhost:5000/listar_clientes"); // Endpoint fictício
+      const response = await axios.get("http://localhost:5000/clientes/listar_clientes"); // Endpoint fictício
       setClientes(response.data);
     } catch (error) {
       setMensagem("Erro ao carregar a lista de clientes.");
@@ -62,42 +76,137 @@ const Cadastros = () => {
       return (
         <div className="formulario">
           <h2>Cadastro de Clientes</h2>
-          <input
-            type="text"
-            name="cnpj"
-            placeholder="CNPJ"
-            value={formData.cnpj}
-            onChange={handleInputChange}
-          />
-          <input
-            type="text"
-            name="razao_social"
-            placeholder="Razão Social"
-            value={formData.razao_social}
-            onChange={handleInputChange}
-          />
-          <input
-            type="text"
-            name="nome_fantasia"
-            placeholder="Nome Fantasia"
-            value={formData.nome_fantasia}
-            onChange={handleInputChange}
-          />
-          <input
-            type="text"
-            name="telefone"
-            placeholder="Telefone"
-            value={formData.telefone}
-            onChange={handleInputChange}
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="E-mail"
-            value={formData.email}
-            onChange={handleInputChange}
-          />
-          <button onClick={cadastrarCliente}>Cadastrar Cliente</button>
+
+          {/* Informações Básicas */}
+          <fieldset className="form-section">
+            <legend>Informações Básicas</legend>
+            <div className="formulario-grid">
+              <input
+                type="text"
+                name="cnpj"
+                placeholder="CNPJ *"
+                value={formData.cnpj}
+                onChange={handleInputChange}
+                required
+              />
+              <input
+                type="text"
+                name="razao_social"
+                placeholder="Razão Social *"
+                value={formData.razao_social}
+                onChange={handleInputChange}
+                required
+              />
+              <input
+                type="text"
+                name="nome_fantasia"
+                placeholder="Nome Fantasia"
+                value={formData.nome_fantasia}
+                onChange={handleInputChange}
+              />
+            </div>
+          </fieldset>
+
+          {/* Contato */}
+          <fieldset className="form-section">
+            <legend>Contato</legend>
+            <div className="formulario-grid">
+              <input
+                type="email"
+                name="email"
+                placeholder="E-mail *"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+              />
+              <input
+                type="text"
+                name="telefone"
+                placeholder="Telefone"
+                value={formData.telefone}
+                onChange={handleInputChange}
+              />
+            </div>
+          </fieldset>
+
+          {/* Endereço */}
+          <fieldset className="form-section">
+            <legend>Endereço</legend>
+            <div className="formulario-grid">
+              <input
+                type="text"
+                name="logradouro"
+                placeholder="Logradouro"
+                value={formData.logradouro}
+                onChange={handleInputChange}
+              />
+              <input
+                type="text"
+                name="bairro"
+                placeholder="Bairro"
+                value={formData.bairro}
+                onChange={handleInputChange}
+              />
+              <input
+                type="text"
+                name="cidade"
+                placeholder="Cidade"
+                value={formData.cidade}
+                onChange={handleInputChange}
+              />
+              <input
+                type="text"
+                name="estado"
+                placeholder="Estado"
+                value={formData.estado}
+                onChange={handleInputChange}
+              />
+              <input
+                type="text"
+                name="cep"
+                placeholder="CEP"
+                value={formData.cep}
+                onChange={handleInputChange}
+              />
+            </div>
+          </fieldset>
+
+          {/* Informações Fiscais */}
+          <fieldset className="form-section">
+            <legend>Informações Fiscais</legend>
+            <div className="formulario-grid">
+              <input
+                type="text"
+                name="inscricao_estadual"
+                placeholder="Inscrição Estadual"
+                value={formData.inscricao_estadual}
+                onChange={handleInputChange}
+              />
+              <input
+                type="text"
+                name="inscricao_municipal"
+                placeholder="Inscrição Municipal"
+                value={formData.inscricao_municipal}
+                onChange={handleInputChange}
+              />
+            </div>
+          </fieldset>
+
+          {/* Observações */}
+          <fieldset className="form-section">
+            <legend>Observações</legend>
+            <textarea
+              name="observacoes"
+              placeholder="Observações adicionais sobre o cliente"
+              value={formData.observacoes}
+              onChange={handleInputChange}
+            />
+          </fieldset>
+
+          {/* Botões */}
+          <div className="form-buttons">
+            <button onClick={cadastrarCliente}>Cadastrar Cliente</button>
+          </div>
         </div>
       );
     }
@@ -119,7 +228,7 @@ const Cadastros = () => {
               value={pesquisa}
               onChange={(e) => setPesquisa(e.target.value)}
             />
-            <button>🔍</button>
+            <button onClick={() => listarClientes()}>🔍</button> {/* Botão de consulta */}
           </div>
           <table className="tabela-cadastrados">
             <thead>

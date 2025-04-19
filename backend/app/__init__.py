@@ -7,14 +7,12 @@ def create_app(config_name='development'):
     app = Flask(__name__)
     
     # Configuração CORS aprimorada
-    cors = CORS(app, resources={
-        r"/auth/*": {
-            "origins": ["http://localhost:5173", "http://localhost:8080"],
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"],
-            "supports_credentials": True
-        }
-    })
+    cors = CORS(app, resources={r"/*": {
+        "origins": ["http://localhost:5173", "http://localhost:8080"],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True
+    }})
 
     # Configurações principais
     app.config.from_object(config[config_name])
@@ -23,7 +21,8 @@ def create_app(config_name='development'):
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
-    
+
+    """
     # Handler para requisições OPTIONS (pré-flight)
     @app.before_request
     def handle_preflight():
@@ -36,7 +35,8 @@ def create_app(config_name='development'):
             response.headers.add("Access-Control-Allow-Methods", 
                                "GET, POST, PUT, DELETE, OPTIONS")
             return response
-
+    """
+    
     # Registrar blueprints
     from .routes.auth_routes import auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
