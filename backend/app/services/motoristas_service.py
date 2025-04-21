@@ -27,6 +27,9 @@ def consultar_motorista(id_motorista=None, cnh=None):
         return Motorista.query.filter_by(CNH=cnh).first()
     raise ValueError("Nenhum critério de busca fornecido")
 
+def listar_motoristas():
+    return Motorista.query.all()
+
 #ATUALIZAR CADASTRO DE MOTORISTA:
 def atualizar_motorista(id_motorista, dados):
     motorista = Motorista.query.get(id_motorista)

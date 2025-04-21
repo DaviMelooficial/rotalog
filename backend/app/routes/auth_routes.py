@@ -67,3 +67,4 @@ def register():
             "error": "Erro no servidor",
             "message": str(e)
         }), 500
+    

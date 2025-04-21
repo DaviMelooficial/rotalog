@@ -1,8 +1,7 @@
 from ..extensions import Blueprint, request, jsonify
-from ..services.motoristas_service import cadastrar_motorista, consultar_motorista, atualizar_motorista, cancelar_motorista
+from ..services.motoristas_service import cadastrar_motorista, consultar_motorista, atualizar_motorista, cancelar_motorista, listar_motoristas
 
 motoristas_bp = Blueprint('motoristas', __name__)
-
 
 @motoristas_bp.route('/cadastrar_motorista', methods=['POST']) #CRIAR MOTORISTA
 def cadastrar_motorista_endpoint():
@@ -91,11 +90,26 @@ def cancelar_motorista_endpoint(id_motorista):
     except Exception as e:  
         return jsonify({"erro": f"Falha no servidor: {str(e)}"}), 500
     
+@motoristas_bp.route('/listar_motoristas', methods=['GET'])  # LISTAR MOTORISTAS
+def listar_motoristas_endpoint():
+    try:
+        # Chama a função de serviço para listar os motoristas
+        motoristas = listar_motoristas()
 
-    
+        # Converte os motoristas para um formato serializável
+        motoristas_serializados = [
+            {
+                "id_motorista": motorista.Id_motorista,
+                "nome_motorista": motorista.nome_motorista,
+                "cpf": motorista.CPF,
+                "cnh": motorista.CNH,
+                "classificacao": motorista.classificacao,
+                "telefone": motorista.Telefone
+            }
+            for motorista in motoristas
+        ]
 
-    
+        return jsonify(motoristas_serializados), 200
 
-    
-    
-    
+    except Exception as e:
+        return jsonify({"erro": f"Falha ao listar motoristas: {str(e)}"}), 500

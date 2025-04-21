@@ -3,7 +3,8 @@ from ..services.veiculos_service import (
     cadastrar_veiculos,
     consultar_veiculo,
     atualizar_veiculo,
-    cancelar_veiculo
+    cancelar_veiculo,
+    listar_veiculos
 )
 
 # Criação do Blueprint para as rotas de veículos
@@ -44,6 +45,36 @@ def consultar():
     except ValueError as e:
         return jsonify({"erro": str(e)}), 400
 
+# Rota para listar todos os veículos
+@veiculos_bp.route('/listar', methods=['GET'])
+def listar():
+    try:
+        # Chama a função de serviço para listar os veículos
+        veiculos = listar_veiculos()
+
+        # Converte os veículos para um formato serializável
+        veiculos_serializados = [
+            {
+                "ID_VEICULO": veiculo.ID_VEICULO,
+                "PLACA": veiculo.PLACA,
+                "MARCA": veiculo.MARCA,
+                "MODELO": veiculo.MODELO,
+                "COR": veiculo.COR,
+                "ANO_FABRICACAO": veiculo.ANO_FABRICACAO,
+                "RENAVAM": veiculo.RENAVAM,
+                "CHASSI": veiculo.CHASSI,
+                "TIPO_CARROCERIA": veiculo.TIPO_CARROCERIA,
+                "CAPACIDADE_CARGA": veiculo.CAPACIDADE_CARGA,
+                "STATUS": veiculo.STATUS
+            }
+            for veiculo in veiculos
+        ]
+
+        return jsonify(veiculos_serializados), 200
+
+    except Exception as e:
+        return jsonify({"erro": f"Falha ao listar veículos: {str(e)}"}), 500
+
 # Rota para atualizar um veículo
 @veiculos_bp.route('/atualizar/<int:id_veiculo>', methods=['PUT'])
 def atualizar(id_veiculo):
@@ -78,8 +109,4 @@ def cancelar(id_veiculo):
     except ValueError as e:
         return jsonify({"erro": str(e)}), 400
     
-
-    '''
-    from app.routes.veiculos_routes import veiculos_bp
-app.register_blueprint(veiculos_bp)
-    ''' 
+    

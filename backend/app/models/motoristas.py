@@ -9,5 +9,3 @@ class Motorista(db.Model):
     CNH = db.Column(db.String(20), unique=True, nullable=False, index=True)
     classificacao = db.Column(db.String(20), nullable=False)  # Ex: Categoria A, B, C, D, E
     Telefone = db.Column(db.String(20), nullable=False)
-
-

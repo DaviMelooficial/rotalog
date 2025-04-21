@@ -15,12 +15,17 @@ const Cadastros = () => {
   const [mensagem, setMensagem] = useState("");
   const [clientes, setClientes] = useState([]);
   const [pesquisa, setPesquisa] = useState("");
+  const [motoristas, setMotoristas] = useState([]);
   const [cnpjConsulta, setCnpjConsulta] = useState("");
   const [clienteConsultado, setClienteConsultado] = useState(null);
-
+  const [veiculos, setVeiculos] = useState([]);
   useEffect(() => {
     if (tipoCadastro === "clientes") {
       listarClientes();
+    } else if (tipoCadastro === "motoristas") {
+      listarMotoristas();
+    } else if (tipoCadastro === "veiculos") {
+      listarVeiculos();
     }
   }, [tipoCadastro]);
 
@@ -28,16 +33,32 @@ const Cadastros = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
-  // Função para consultar cliente pelo CNPJ
-  const consultarCliente = async () => {
+  // Função para cadastrar motorista
+  const cadastrarMotorista = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/clientes/consultar_cliente/${cnpjConsulta}`);
-      setClienteConsultado(response.data); // Armazena os dados do cliente consultado
-      setMensagem(""); // Limpa mensagens de erro
+      const response = await axios.post(
+        "http://localhost:5000/motoristas/cadastrar_motorista",
+        formData
+      );
+      setMensagem(response.data.mensagem);
+      setFormData({
+        nome_motorista: "",
+        cpf: "",
+        cnh: "",
+        telefone: "",
+        classificacao: "",
+      });
     } catch (error) {
-      setClienteConsultado(null); // Limpa os dados do cliente consultado
-      setMensagem(error.response?.data?.erro || "Erro ao consultar cliente.");
+      setMensagem(error.response?.data?.erro || "Erro ao cadastrar motorista.");
+    }
+  };
+  const listarMotoristas = async () => {
+    try {
+      // Faz a requisição ao endpoint para listar motoristas
+      const response = await axios.get("http://localhost:5000/motoristas/listar_motoristas");
+      setMotoristas(response.data); // Atualiza o estado com os motoristas retornados
+    } catch (error) {
+      setMensagem("Erro ao carregar a lista de motoristas.");
     }
   };
   
@@ -68,6 +89,41 @@ const Cadastros = () => {
       setClientes(response.data);
     } catch (error) {
       setMensagem("Erro ao carregar a lista de clientes.");
+    }
+  };
+
+  const cadastrarVeiculo = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/veiculos/cadastrar",
+        formData
+      );
+      setMensagem(response.data.mensagem || "Veículo cadastrado com sucesso!");
+      setFormData({
+        placa: "",
+        marca: "",
+        modelo: "",
+        cor: "",
+        ano_fabricacao: "",
+        renavam: "",
+        chassi: "",
+        tipo_carroceria: "",
+        capacidade_carga: "",
+        status: "",
+      });
+      listarVeiculos(); // Atualiza a lista após o cadastro
+    } catch (error) {
+      setMensagem(error.response?.data?.erro || "Erro ao cadastrar veículo.");
+    }
+  };
+  
+  const listarVeiculos = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/veiculos/listar");
+      console.log("Dados retornados do backend:", response.data); // Verifique os dados aqui
+      setVeiculos(response.data); // Atualiza o estado com os veículos retornados
+    } catch (error) {
+      setMensagem("Erro ao carregar a lista de veículos.");
     }
   };
 
@@ -210,13 +266,176 @@ const Cadastros = () => {
         </div>
       );
     }
+    else if (tipoCadastro === "motoristas") {
+      return (
+        <div className="formulario">
+          <h2>Cadastro de Motoristas</h2>
+  
+          {/* Informações Básicas */}
+          <fieldset className="form-section">
+            <legend>Informações Básicas</legend>
+            <div className="formulario-grid">
+              <input
+                type="text"
+                name="nome_motorista"
+                placeholder="Nome do Motorista *"
+                value={formData.nome_motorista || ""}
+                onChange={handleInputChange}
+                required
+              />
+              <input
+                type="text"
+                name="cpf"
+                placeholder="CPF *"
+                value={formData.cpf || ""}
+                onChange={handleInputChange}
+                required
+              />
+              <input
+                type="text"
+                name="cnh"
+                placeholder="CNH *"
+                value={formData.cnh || ""}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+          </fieldset>
+  
+          {/* Contato */}
+          <fieldset className="form-section">
+            <legend>Contato</legend>
+            <div className="formulario-grid">
+              <input
+                type="text"
+                name="telefone"
+                placeholder="Telefone"
+                value={formData.telefone || ""}
+                onChange={handleInputChange}
+              />
+            </div>
+          </fieldset>
+  
+          {/* Classificação */}
+          <fieldset className="form-section">
+            <legend>Classificação</legend>
+            <div className="formulario-grid">
+              <input
+                type="text"
+                name="classificacao"
+                placeholder="Classificação"
+                value={formData.classificacao || ""}
+                onChange={handleInputChange}
+              />
+            </div>
+          </fieldset>
+  
+          {/* Botões */}
+          <div className="form-buttons">
+            <button onClick={cadastrarMotorista}>Cadastrar Motorista</button>
+          </div>
+        </div>
+      );
+    }
+    else if (tipoCadastro === "veiculos") {
+      return (
+        <div className="formulario">
+          <h2>Cadastro de Veículos</h2>
+    
+          {/* Informações do Veículo */}
+          <fieldset className="form-section">
+            <legend>Informações do Veículo</legend>
+            <div className="formulario-grid">
+              <input
+                type="text"
+                name="placa"
+                placeholder="Placa *"
+                value={formData.placa || ""}
+                onChange={handleInputChange}
+                required
+              />
+              <input
+                type="text"
+                name="marca"
+                placeholder="Marca *"
+                value={formData.marca || ""}
+                onChange={handleInputChange}
+                required
+              />
+              <input
+                type="text"
+                name="modelo"
+                placeholder="Modelo *"
+                value={formData.modelo || ""}
+                onChange={handleInputChange}
+                required
+              />
+              <input
+                type="text"
+                name="cor"
+                placeholder="Cor"
+                value={formData.cor || ""}
+                onChange={handleInputChange}
+              />
+              <input
+                type="number"
+                name="ano_fabricacao"
+                placeholder="Ano de Fabricação"
+                value={formData.ano_fabricacao || ""}
+                onChange={handleInputChange}
+              />
+              <input
+                type="text"
+                name="renavam"
+                placeholder="Renavam"
+                value={formData.renavam || ""}
+                onChange={handleInputChange}
+              />
+              <input
+                type="text"
+                name="chassi"
+                placeholder="Chassi"
+                value={formData.chassi || ""}
+                onChange={handleInputChange}
+              />
+              <input
+                type="text"
+                name="tipo_carroceria"
+                placeholder="Tipo de Carroceria"
+                value={formData.tipo_carroceria || ""}
+                onChange={handleInputChange}
+              />
+              <input
+                type="number"
+                name="capacidade_carga"
+                placeholder="Capacidade de Carga (kg)"
+                value={formData.capacidade_carga || ""}
+                onChange={handleInputChange}
+              />
+              <input
+                type="text"
+                name="status"
+                placeholder="Status"
+                value={formData.status || ""}
+                onChange={handleInputChange}
+              />
+            </div>
+          </fieldset>
+    
+          {/* Botões */}
+          <div className="form-buttons">
+            <button onClick={cadastrarVeiculo}>Cadastrar Veículo</button>
+          </div>
+        </div>
+      );
+    }
     return <p>Selecione uma opção para cadastro.</p>;
   };
 
   const renderTabela = () => {
     if (tipoCadastro === "clientes") {
       const clientesFiltrados = clientes.filter((cliente) =>
-        cliente.razao_social.toLowerCase().includes(pesquisa.toLowerCase())
+        cliente.razao_social?.toLowerCase().includes(pesquisa.toLowerCase())
       );
       return (
         <div className="tabela-container">
@@ -243,6 +462,101 @@ const Cadastros = () => {
                 <tr key={cliente.cnpj}>
                   <td>{cliente.razao_social}</td>
                   <td>{cliente.cnpj}</td>
+                  <td>
+                    <button>Detalhes</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+    else if (tipoCadastro === "motoristas") {
+      const motoristasFiltrados = motoristas.filter((motorista) =>
+        motorista.nome_motorista?.toLowerCase().includes(pesquisa.toLowerCase())
+      );
+      return (
+        <div className="tabela-container">
+          <h2>Motoristas Cadastrados</h2>
+          <div className="pesquisa-container">
+            <input
+              type="text"
+              placeholder="Pesquisar motoristas..."
+              value={pesquisa}
+              onChange={(e) => setPesquisa(e.target.value)}
+            />
+            <button onClick={() => listarMotoristas()}>🔍</button>
+          </div>
+          <table className="tabela-cadastrados">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>CPF</th>
+                <th>CNH</th>
+                <th>Classificação</th>
+                <th>Telefone</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {motoristasFiltrados.map((motorista) => (
+                <tr key={motorista.id_motorista}>
+                  <td>{motorista.nome_motorista}</td>
+                  <td>{motorista.cpf}</td>
+                  <td>{motorista.cnh}</td>
+                  <td>{motorista.classificacao}</td>
+                  <td>{motorista.telefone}</td>
+                  <td>
+                    <button>Detalhes</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+    else if (tipoCadastro === "veiculos") {
+      const veiculosFiltrados = veiculos.filter((veiculo) =>
+        veiculo.PLACA?.toLowerCase().includes(pesquisa.toLowerCase())
+      );
+      console.log("Veículos filtrados:", veiculosFiltrados); // Verifique os dados filtrados
+      return (
+        <div className="tabela-container">
+          <h2>Veículos Cadastrados</h2>
+          <div className="pesquisa-container">
+            <input
+              type="text"
+              placeholder="Pesquisar veículos..."
+              value={pesquisa}
+              onChange={(e) => setPesquisa(e.target.value)}
+            />
+            <button onClick={() => listarVeiculos()}>🔍</button>
+          </div>
+          <table className="tabela-cadastrados">
+            <thead>
+              <tr>
+                <th>Placa</th>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th>Cor</th>
+                <th>Ano</th>
+                <th>Capacidade</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {veiculosFiltrados.map((veiculo) => (
+                <tr key={veiculo.ID_VEICULO}>
+                  <td>{veiculo.PLACA}</td>
+                  <td>{veiculo.MARCA}</td>
+                  <td>{veiculo.MODELO}</td>
+                  <td>{veiculo.COR}</td>
+                  <td>{veiculo.ANO_FABRICACAO}</td>
+                  <td>{veiculo.CAPACIDADE_CARGA} kg</td>
+                  <td>{veiculo.STATUS}</td>
                   <td>
                     <button>Detalhes</button>
                   </td>

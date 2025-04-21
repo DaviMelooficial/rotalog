@@ -38,6 +38,8 @@ def consultar_veiculo(id_veiculo=None, placa=None):
     raise ValueError("Nenhum critério de busca fornecido")
 #VERIFICAR A POSSIBILIDADE DE ADICIONAR SOBRE OS STATUS.
 
+def listar_veiculos():
+    return Veiculo.query.all()
 
 #ATUALIZAR VEÍCULO
 def atualizar_veiculo(id_veiculo, dados_veiculo):

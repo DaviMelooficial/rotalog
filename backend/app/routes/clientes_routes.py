@@ -111,3 +111,4 @@ def endpoint_listar_clientes():
 
     except Exception as e:
         return jsonify({"erro": f"Falha ao listar clientes: {str(e)}"}), 500
+    

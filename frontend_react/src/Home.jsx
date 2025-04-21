@@ -7,11 +7,13 @@ const Home = () => {
     <div className="home-container">
       <Sidebar />
       <div className="home-content">
-        <header className="home-header">
-          <h1>Painel de Logística</h1>
-          <div className="user-info">
-            <span>Bem-vindo, Admin</span>
-            <span className="user-icon">👤</span>
+      <header className="home-header-card">
+          <div className="home-header">
+            <h1>Painel de Logística</h1>
+            <div className="user-info">
+              <span>Bem-vindo, Admin</span>
+              <span className="user-icon">👤</span>
+            </div>
           </div>
         </header>
 

@@ -1,39 +1,51 @@
 .home-container {
   display: flex;
   min-height: 100vh;
-  background-color: #f8f9fc; /* Fundo claro */
+  background-color: #f4f7fc; /* Fundo claro */
 }
 
 .home-content {
   margin-left: 250px;
   flex: 1;
-  padding: 1rem 2rem; /* Reduz o espaçamento superior */
-  background-color: #f8f9fc; /* Fundo claro */
+  padding: 2rem;
+  background-color: #f4f7fc; /* Fundo claro */
+}
+
+.home-header-card {
+  background-color: #ffffff; /* Fundo branco */
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra leve */
+  margin-bottom: 2rem; /* Espaçamento inferior */
+  position: sticky; /* Fixa o card no topo */
+  top: 0; /* Colado no topo */
+  z-index: 10; /* Garante que fique acima de outros elementos */
+  margin-right: 0; /* Remove margem à direita */
+  margin-left: 0; /* Remove margem à esquerda */
 }
 
 .home-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem; /* Ajusta o espaçamento inferior */
 }
 
 .home-header h1 {
   font-size: 2rem;
   font-weight: bold;
-  color: #333;
+  color: #1a202c; /* Cinza escuro */
 }
 
 .user-info {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #555;
+  color: #4a5568; /* Cinza médio */
 }
 
 .user-icon {
   font-size: 1.5rem;
-  background-color: #007bff;
+  background-color: #3182ce; /* Azul moderno */
   color: white;
   padding: 0.5rem;
   border-radius: 50%;
@@ -43,7 +55,7 @@
 .deliveries-section,
 .pending-deliveries-section {
   margin-bottom: 1.5rem; /* Reduz o espaçamento entre os cards */
-  background-color: #fff;
+  background-color: #ffffff; /* Branco */
   padding: 1.5rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -54,7 +66,7 @@
 .pending-deliveries-section h2 {
   font-size: 1.5rem;
   margin-bottom: 1rem;
-  color: #333;
+  color: #1a202c; /* Cinza escuro */
 }
 
 .status-cards {
@@ -69,26 +81,27 @@
   gap: 1rem;
   padding: 1rem;
   border-radius: 8px;
-  background-color: #fff;
+  background-color: #ffffff; /* Branco */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .status-card.success {
-  border-left: 4px solid #28a745;
+  border-left: 4px solid #38a169; /* Verde para sucesso */
 }
 
 .status-card.danger {
-  border-left: 4px solid #dc3545;
+  border-left: 4px solid #e53e3e; /* Vermelho para erro */
 }
 
 .status-icon {
   font-size: 2rem;
+  color: #3182ce; /* Azul moderno */
 }
 
 .deliveries-table {
   width: 100%;
   border-collapse: collapse;
-  background-color: #fff;
+  background-color: #ffffff; /* Branco */
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -98,24 +111,24 @@
 .deliveries-table td {
   padding: 1rem;
   text-align: left;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #e2e8f0; /* Cinza claro */
 }
 
 .deliveries-table th {
-  background-color: #f1f1f1;
+  background-color: #edf2f7; /* Fundo claro para cabeçalho */
   font-size: 1rem; /* Tamanho do texto do cabeçalho da tabela */
   font-weight: 500;
-  color: #333;
+  color: #2d3748; /* Cinza escuro */
 }
 
 .deliveries-table td {
   font-size: 0.9rem; /* Tamanho do texto das células */
   font-weight: 400;
-  color: #555;
+  color: #4a5568; /* Cinza médio */
 }
 
 .deliveries-table tr:hover {
-  background-color: #f9f9f9;
+  background-color: #e2e8f0; /* Cinza claro ao passar o mouse */
 }
 
 .status-label {
@@ -126,13 +139,13 @@
 }
 
 .status-label.atrasada {
-  background-color: #f8d7da;
-  color: #721c24;
+  background-color: #f8d7da; /* Vermelho claro */
+  color: #721c24; /* Vermelho escuro */
 }
 
 .status-label.no-prazo {
-  background-color: #d4edda;
-  color: #155724;
+  background-color: #d4edda; /* Verde claro */
+  color: #155724; /* Verde escuro */
 }
 
 .pagination {
@@ -145,7 +158,7 @@
 .page-button {
   padding: 0.5rem 1rem;
   border: none;
-  background-color: #007bff;
+  background-color: #3182ce; /* Azul moderno */
   color: white;
   border-radius: 4px;
   cursor: pointer;
@@ -153,13 +166,13 @@
 }
 
 .page-button:hover {
-  background-color: #0056b3;
+  background-color: #2b6cb0; /* Azul mais escuro */
 }
 
 button {
   padding: 0.5rem 1rem;
   border: none;
-  background-color: #007bff;
+  background-color: #3182ce; /* Azul moderno */
   color: white;
   border-radius: 4px;
   cursor: pointer;
@@ -167,5 +180,5 @@ button {
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #2b6cb0; /* Azul mais escuro */
 }

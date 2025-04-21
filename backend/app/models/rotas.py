@@ -19,12 +19,4 @@ class Rota(db.Model):
     #Planejamento de rota deve ser alinhado junto com equipe de gerencia e logística.
     #Relacionamento com entregas (uma rota tem muitas entregas)
     entregas = db.relationship('Entrega', backref='rota_vinculada', lazy=True)
-
-   
-
-
-
     
-
-
-
