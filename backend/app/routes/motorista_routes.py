@@ -16,8 +16,8 @@ def cadastrar_motorista_endpoint():
         
         return jsonify({
             "mensagem": "Motorista cadastrado com sucesso",
-            "id_motorista": motorista.Id_motorista,
-            "nome_motorista": motorista.nome_motorista
+            "id_motorista": motorista.get("id_motorista"),
+            "nome_motorista": motorista.get("nome_motorista")
         }), 201
 
     except ValueError as e:
@@ -63,7 +63,7 @@ def atualizar_motorista_endpoint(id_motorista):
 
         return jsonify({
             "mensagem": "Motorista atualizado com sucesso",
-            "id_motorista": motorista.Id_motorista,
+            "id_motorista": motorista.id_motorista,
             "nome_motorista": motorista.nome_motorista
         }), 200
 
@@ -99,12 +99,12 @@ def listar_motoristas_endpoint():
         # Converte os motoristas para um formato serializável
         motoristas_serializados = [
             {
-                "id_motorista": motorista.Id_motorista,
+                "id_motorista": motorista.id_motorista,
                 "nome_motorista": motorista.nome_motorista,
-                "cpf": motorista.CPF,
-                "cnh": motorista.CNH,
+                "cpf": motorista.cpf,
+                "cnh": motorista.cnh,
                 "classificacao": motorista.classificacao,
-                "telefone": motorista.Telefone
+                "telefone": motorista.telefone
             }
             for motorista in motoristas
         ]

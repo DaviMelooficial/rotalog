@@ -1,5 +1,5 @@
 from ..extensions import Blueprint,request, jsonify
-from ..services.entregas_service import cadastrar_entrega, consultar_entrega, atualizar_entrega, cancelar_entrega
+from ..services.entregas_service import cadastrar_entrega, consultar_entrega, atualizar_entrega, listar_entregas, cancelar_entrega
 
 entregas_bp = Blueprint('entregas', __name__)
 
@@ -61,7 +61,34 @@ def consultar_entrega_endpoint():
     except Exception as e:
         return jsonify({"erro": f"Falha no servidor: {str(e)}"}), 500    
 
+@entregas_bp.route('/listar_entregas', methods=['GET'])
+def listar_entregas_endpoint():
+    try:
+        entregas = listar_entregas()
+        
+        if not entregas:
+            return jsonify({"mensagem": "Nenhuma entrega encontrada"}), 404
+        
+        entregas_list = []
+        for entrega in entregas:
+            entregas_list.append({
+                "id": entrega.id_entrega,
+                "cnpj_cliente": entrega.cnpj_cliente,
+                "nota_fiscal": entrega.nota_fiscal,
+                "logradouro_entrega": entrega.logradouro_entrega,
+                "bairro_entrega": entrega.bairro_entrega,
+                "cidade_entrega": entrega.cidade_entrega,
+                "estado_entrega": entrega.estado_entrega,
+                "cep_entrega": entrega.cep_entrega,
+                "volume": entrega.volume,
+                "data_entrega": entrega.data_entrega.strftime('%Y-%m-%d'),
+                "status": "Vinculada" if hasattr(entrega, "ROTA") and entrega.ROTA else "Pendente"
+            })
+        
+        return jsonify(entregas_list), 200
 
+    except Exception as e:
+        return jsonify({"erro": f"Falha no servidor: {str(e)}"}), 500
 #ATUALIZAR ENTREGAS
 @entregas_bp.route('/atualizar_entrega/<string:nota_fiscal>', methods=['PUT'])
 def atualizar_entrega_endpoint(nota_fiscal):

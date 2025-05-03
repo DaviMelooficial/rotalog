@@ -66,7 +66,7 @@ def reset_password(token):
         }), 500
 
 @auth_bp.route('/register', methods=['POST'])
-def register():
+def user_register():
     try:
         data = request.get_json()
         if not data:
@@ -111,7 +111,7 @@ def register():
         }), 500
 
 @auth_bp.route('/consult_user/<string:cpf>', methods=['GET'])
-def endpoint_consult(cpf):
+def user_consult(cpf):
     try:
         user = AuthService.consult_user(cpf=cpf)
         return jsonify({
@@ -127,7 +127,7 @@ def endpoint_consult(cpf):
         return jsonify({"erro": str(e)}), 404
 
 @auth_bp.route('/list_users', methods=['GET'])
-def endpoint_list():
+def user_list():
     try:
         users = AuthService.list_users()
         return jsonify([{
@@ -143,7 +143,7 @@ def endpoint_list():
         return jsonify({"erro": str(e)}), 500
     
 @auth_bp.route('/update_user/<string:cpf>', methods=['PUT'])
-def endpoint_update(cpf):
+def user_update(cpf):
     try:
         data = request.get_json()
         if not data:
@@ -164,7 +164,7 @@ def endpoint_update(cpf):
     
     
 @auth_bp.route('/disable_user/<string:cpf>', methods=['DELETE'])
-def endpoint_disable(cpf):
+def user_disable(cpf):
     try:
         AuthService.disable_user(cpf)
         return jsonify({"message": "Usuário cancelado com sucesso"}), 200
@@ -172,3 +172,24 @@ def endpoint_disable(cpf):
         return jsonify({"error": str(e)}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@auth_bp.route('/forgot_password', methods=['POST'])
+def forgot_password():
+    try:
+        data = request.get_json()
+        if not data or 'email' not in data:
+            return jsonify({"error": "Email é obrigatório"}), 400
+
+        email = data['email']
+        
+        try:
+            AuthService.forgot_password(email)
+            return jsonify({"message": "Uma nova senha foi enviada para seu email"}), 200
+        except ValueError as e:
+            return jsonify({"error": str(e)}), 404
+
+    except Exception as e:
+        return jsonify({
+            "error": "Erro no servidor",
+            "message": str(e)
+        }), 500

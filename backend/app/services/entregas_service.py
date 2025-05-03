@@ -27,7 +27,6 @@ def cadastrar_entrega(dados):
     db.session.commit()
     return nova_entrega
 
-#CONSULTA DE ENTREGA:
 def consultar_entrega(nota_fiscal):
     if not nota_fiscal:
         raise ValueError("Nota fiscal não fornecida")
@@ -39,7 +38,13 @@ def consultar_entrega(nota_fiscal):
     
     return entrega
 
-#ATUALIZAR CADASTRO:
+def listar_entregas():
+    entregas = Entrega.query.all()
+    if not entregas:
+        raise ValueError("Nenhuma entrega encontrada")
+    
+    return entregas
+
 def atualizar_entrega(nota_fiscal, dados):
     entrega = Entrega.query.filter_by(nota_fiscal=nota_fiscal).first()
     if not entrega:
@@ -62,7 +67,6 @@ def atualizar_entrega(nota_fiscal, dados):
     db.session.commit()
     return entrega
 
-# DELETE (Lógico)
 def cancelar_entrega(nota_fiscal):
     """Cancela a entrega alterando o status para 'Cancelada'."""
     entrega = Entrega.query.filter_by(nota_fiscal=nota_fiscal).first()

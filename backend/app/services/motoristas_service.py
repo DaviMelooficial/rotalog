@@ -53,7 +53,7 @@ def atualizar_motorista(id_motorista, dados):
     if not motorista:
         raise ValueError("Motorista não encontrado")
     
-    campos_permitidos = ['nome_motorista', 'CPF', 'CNH', 'classificacao', 'Telefone']
+    campos_permitidos = ['nome_motorista', 'cpf', 'cnh', 'classificacao', 'telefone']
     for campo, valor in dados.items():
         if campo in campos_permitidos:
             setattr(motorista, campo, valor)
