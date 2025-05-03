@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 from config import config
-from .extensions import db, migrate, jwt
+from .extensions import db, migrate, jwt, mail
 
 def create_app(config_name='development'):
     app = Flask(__name__)
@@ -21,6 +21,7 @@ def create_app(config_name='development'):
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
+    mail.init_app(app)
 
     """
     # Handler para requisições OPTIONS (pré-flight)

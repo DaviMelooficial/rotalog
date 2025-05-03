@@ -1,8 +1,8 @@
-"""Criação da coluna status na tabela entrega
+"""empty message
 
-Revision ID: 86f309faddd4
+Revision ID: dfd54627da65
 Revises: 
-Create Date: 2025-04-18 14:44:55.315537
+Create Date: 2025-05-02 16:29:28.946191
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '86f309faddd4'
+revision = 'dfd54627da65'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -42,23 +42,28 @@ def upgrade():
         batch_op.create_index(batch_op.f('ix_clientes_cnpj'), ['cnpj'], unique=True)
 
     op.create_table('motoristas',
-    sa.Column('Id_motorista', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('id_motorista', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('nome_motorista', sa.String(length=255), nullable=False),
-    sa.Column('CPF', sa.String(length=11), nullable=False),
-    sa.Column('CNH', sa.String(length=20), nullable=False),
+    sa.Column('cpf', sa.String(length=15), nullable=False),
+    sa.Column('cnh', sa.String(length=20), nullable=False),
     sa.Column('classificacao', sa.String(length=20), nullable=False),
-    sa.Column('Telefone', sa.String(length=20), nullable=False),
-    sa.PrimaryKeyConstraint('Id_motorista')
+    sa.Column('telefone', sa.String(length=20), nullable=False),
+    sa.PrimaryKeyConstraint('id_motorista')
     )
     with op.batch_alter_table('motoristas', schema=None) as batch_op:
-        batch_op.create_index(batch_op.f('ix_motoristas_CNH'), ['CNH'], unique=True)
-        batch_op.create_index(batch_op.f('ix_motoristas_CPF'), ['CPF'], unique=True)
+        batch_op.create_index(batch_op.f('ix_motoristas_cnh'), ['cnh'], unique=True)
+        batch_op.create_index(batch_op.f('ix_motoristas_cpf'), ['cpf'], unique=True)
 
-    op.create_table('user',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('username', sa.String(length=80), nullable=False),
+    op.create_table('users',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('status', sa.String(length=10), nullable=False),
+    sa.Column('name', sa.String(length=50), nullable=False),
     sa.Column('cpf', sa.String(length=11), nullable=False),
+    sa.Column('email', sa.String(length=50), nullable=False),
+    sa.Column('position', sa.String(length=30), nullable=False),
+    sa.Column('username', sa.String(length=80), nullable=False),
     sa.Column('password_hash', sa.String(length=256), nullable=False),
+    sa.Column('reset_token', sa.String(length=128), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('cpf'),
     sa.UniqueConstraint('username')
@@ -110,10 +115,10 @@ def downgrade():
         batch_op.drop_index(batch_op.f('ix_veiculos_CHASSI'))
 
     op.drop_table('veiculos')
-    op.drop_table('user')
+    op.drop_table('users')
     with op.batch_alter_table('motoristas', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_motoristas_CPF'))
-        batch_op.drop_index(batch_op.f('ix_motoristas_CNH'))
+        batch_op.drop_index(batch_op.f('ix_motoristas_cpf'))
+        batch_op.drop_index(batch_op.f('ix_motoristas_cnh'))
 
     op.drop_table('motoristas')
     with op.batch_alter_table('clientes', schema=None) as batch_op:
