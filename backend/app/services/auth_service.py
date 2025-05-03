@@ -7,7 +7,7 @@ import random, string, secrets
 
 class AuthService:
     @staticmethod
-    def create_user(name, cpf, email, position, username, password):
+    def create_user(name, cpf, email, position, username, password):    
 
         if User.query.filter_by(username=username).first():
             return None, 'Username já existe'
@@ -49,10 +49,31 @@ class AuthService:
     def send_email_password(email, password, name, username):
         try:
             msg = Message(
-                subject= "Bem Vindo ao Rotalog",
+                subject="Bem Vindo ao Rotalog",
+                sender=("Rotalog System", "noreply@rotalog.com"),
                 recipients=[email],
                 body=f"Olá {name} seu login foi criado com sucesso \n \nAqui estão suas credenciais: \nUsuário: {username} \nSenha: {password}\n \n Por favor, altere sua senha após primeiro acesso.",
+                html=f"""
+                <html>
+                    <body>
+                        <h2>Bem-vindo ao Rotalog!</h2>
+                        <p>Olá {name},</p>
+                        <p>Seu login foi criado com sucesso.</p>
+                        <h3>Suas credenciais de acesso:</h3>
+                        <p><strong>Usuário:</strong> {username}</p>
+                        <p><strong>Senha:</strong> {password}</p>
+                        <p style="color: red;"><strong>Importante:</strong> Por favor, altere sua senha após o primeiro acesso.</p>
+                        <br>
+                        <p>Atenciosamente,<br>Equipe Rotalog</p>
+                    </body>
+                </html>
+                """
             )
+            # Adiciona headers importantes
+            msg.extra_headers = {
+                "List-Unsubscribe": f"<mailto:unsubscribe@rotalog.com?subject=unsubscribe>",
+                "Precedence": "bulk"
+            }
             mail.send(msg)
         except Exception as e:
             print(f"Erro ao enviar e-mail: {str(e)}")
@@ -121,36 +142,57 @@ class AuthService:
             raise Exception(f"Erro ao deletar cliente: {str(e)}")
         
     @staticmethod
-    def forgot_password(identifier):
-        user = User.query.filter((User.cpf == identifier) | (User.email == identifier)).first()
+    def forgot_password(email):
+        user = User.query.filter_by(email=email).first()
         if not user:
-            raise ValueError("Usuário não encontrado")
-        email = user.email
-        masked_email = f"{email[0]}{'*' * (len(email.split('@')[0]) - 2)}{email[email.index('@') - 1:]}"
+            raise ValueError("Email não encontrado")
 
-        reset_token = secrets.token_urlsafe(32)
-        user.reset_token = reset_token
+        # Gera nova senha aleatória
+        new_password = AuthService.generate_password()
+        
+        # Atualiza a senha do usuário
+        user.set_password(new_password)
 
         try:
             db.session.commit()
         except Exception as e:
             db.session.rollback()
-            raise Exception(f"Erro ao salvar token de redefinição: {str(e)}")
-    
-        reset_link = url_for('auth.reset_password', token=reset_token, _external=True)
+            raise Exception(f"Erro ao atualizar senha: {str(e)}")
 
         try:
             msg = Message(
-                subject="Redefinição de Senha ROTALOG",
-                recipients= [User.email],
-                body=f"""Olá, {User.name}. Você solicitou a redefinição de sua senha. 
-                        Clique no link abaixo para redefinir sua senha:\n\n{reset_link}\n\nSe você não solicitou essa redefinição, ignore este e-mail.",
-                        Atenciosamente,
-                        Equipe Rotalog
-                    """
+                subject="Nova Senha - Rotalog",
+                sender=("Rotalog System", "rotalog00@gmail.com"),
+                recipients=[email],
+                body=f"""Olá {user.name},
+
+Conforme solicitado, sua senha foi redefinida.
+Sua nova senha é: {new_password}
+
+Por favor, altere esta senha após seu próximo login por motivos de segurança.
+
+Atenciosamente,
+Equipe Rotalog""",
+                html=f"""
+                <html>
+                    <body>
+                        <h2>Nova Senha - Rotalog</h2>
+                        <p>Olá {user.name},</p>
+                        <p>Conforme solicitado, sua senha foi redefinida.</p>
+                        <p><strong>Sua nova senha é:</strong> {new_password}</p>
+                        <p style="color: red;"><strong>Importante:</strong> Por favor, altere esta senha após seu próximo login por motivos de segurança.</p>
+                        <br>
+                        <p>Atenciosamente,<br>Equipe Rotalog</p>
+                    </body>
+                </html>
+                """
             )
+            # Adiciona headers importantes
+            msg.extra_headers = {
+                "List-Unsubscribe": f"<mailto:unsubscribe@rotalog.com?subject=unsubscribe>",
+                "Precedence": "bulk"
+            }
             mail.send(msg)
+            return True
         except Exception as e:
             raise Exception(f"Erro ao enviar e-mail: {str(e)}")
-        return masked_email
-        

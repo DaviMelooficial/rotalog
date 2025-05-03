@@ -9,12 +9,17 @@ class Config:
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'SELVA')
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
 
+    # Configurações de Email
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 587
     MAIL_USE_TLS = True
-    MAIL_USERNAME = 'rotalog00@gmail.com'  # Substitua pelo seu e-mail
-    MAIL_PASSWORD = 'homj mabg ljet bstk'    # Substitua pela senha de aplicativo do Gmail
-    MAIL_DEFAULT_SENDER = 'rotalog00@gmail.com'  # Substitua pelo e-mail do remetente
+    MAIL_USERNAME = 'rotalog00@gmail.com'
+    MAIL_PASSWORD = 'homj mabg ljet bstk'
+    MAIL_DEFAULT_SENDER = ('Rotalog System', 'rotalog00@gmail.com')
+    MAIL_MAX_EMAILS = 100
+    MAIL_ASCII_ATTACHMENTS = False
+    MAIL_SUPPRESS_SEND = False
+    MAIL_DEBUG = True  # Defina como False em produção
 
 class DevelopmentConfig(Config):
     DEBUG = True
