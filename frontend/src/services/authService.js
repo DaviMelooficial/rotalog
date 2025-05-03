@@ -26,7 +26,7 @@ const authService = {
 
   async resetPassword(email) {
     try {
-      const response = await axios.post(`${API_URL}/reset_password`, {
+      const response = await axios.post(`${API_URL}/forgot_password`, {
         email
       });
       return response.data;

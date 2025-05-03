@@ -8,7 +8,7 @@ def create_app(config_name='development'):
     
     # Configuração CORS aprimorada
     cors = CORS(app, resources={r"/*": {
-        "origins": ["http://localhost:5173", "http://localhost:8080"],
+        "origins": ["http://localhost:5174", "http://localhost:8080"],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
         "supports_credentials": True

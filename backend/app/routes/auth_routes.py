@@ -36,13 +36,14 @@ def login():
         }), 500
     
 @auth_bp.route('/reset_password', methods=['POST'])
-def reset_password(token):
+def reset_password():
     try:
         data = request.get_json()
-        if not data or 'new_password' not in data:
+        if not data or 'new_password' not in data or 'token' not in data:
             return jsonify({"error": "Dados inválidos"}), 400
 
-        new_password = data('new_password')
+        new_password = data['new_password']
+        token = data['token']
         user = User.query.filter_by(reset_token=token).first()
 
         if not user:
@@ -55,7 +56,6 @@ def reset_password(token):
         except Exception as e:
             db.session.rollback()
             raise Exception({"error": "Erro ao redefinir a senha"})
-
 
         return jsonify({"message": "Senha redefinida com sucesso"}), 200
 

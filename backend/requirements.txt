@@ -1,5 +1,6 @@
 Flask
 Flask-Cors
+Flask-mail
 Flask-SQLAlchemy
 Flask-Migrate
 Flask-RESTful
