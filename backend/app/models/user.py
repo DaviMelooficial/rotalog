@@ -2,10 +2,17 @@ from ..extensions import db
 from werkzeug.security import generate_password_hash, check_password_hash
 
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    status = db.Column(db.String(10), nullable=False, default='active')
+    name = db.Column(db.String(50), nullable=False)
     cpf = db.Column(db.String(11), unique=True, nullable=False)
+    email = db.Column(db.String(50), unique=False, nullable=False)
+    position = db.Column(db.String(30), nullable=False) # 1 - Operacional, 2 - Supervisão, 3 - Gerência, 4 - Diretoria, 5 - TI
+    username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
+    reset_token = db.Column(db.String(128), nullable=True)  # Novo campo para o token
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

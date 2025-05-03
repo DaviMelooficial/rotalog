@@ -75,7 +75,7 @@ def atualizar_cliente(cnpj, dados):
     for campo, valor in dados.items():
         if campo in campos_permitidos:
             setattr(cliente, campo, valor)
-
+        
     try:
         db.session.commit()
         return cliente
