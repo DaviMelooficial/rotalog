@@ -126,6 +126,34 @@ def user_consult(cpf):
     except ValueError as e:
         return jsonify({"erro": str(e)}), 404
 
+@auth_bp.route('/consult_user', methods=['GET'])
+def user_consult_query():
+    try:
+        cpf = request.args.get('cpf')
+        email = request.args.get('email')
+        name = request.args.get('name')
+
+        if not any([cpf, email, name]):
+            return jsonify({"error": "Pelo menos um parâmetro de consulta (cpf, email, name) deve ser fornecido"}), 400
+
+        user = AuthService.consult_user_by_query(cpf=cpf, email=email, name=name)
+        if not user:
+            return jsonify({"error": "Usuário não encontrado"}), 404
+
+        return jsonify({
+            "id": user.id,
+            "status": user.status,
+            "cpf": user.cpf,
+            "email": user.email,
+            "name": user.name,
+            "position": user.position
+        }), 200
+
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 404
+    except Exception as e:
+        return jsonify({"error": "Erro no servidor", "message": str(e)}), 500
+
 @auth_bp.route('/list_users', methods=['GET'])
 def user_list():
     try:
@@ -163,10 +191,10 @@ def user_update(cpf):
         return jsonify({"error": str(e)}), 500
     
     
-@auth_bp.route('/disable_user/<string:cpf>', methods=['DELETE'])
-def user_disable(cpf):
+@auth_bp.route('/disable_user/<string:id>', methods=['PUT'])
+def user_disable(id):
     try:
-        AuthService.disable_user(cpf)
+        AuthService.disable_user(id)
         return jsonify({"message": "Usuário cancelado com sucesso"}), 200
     except ValueError as e:
         return jsonify({"error": str(e)}), 404

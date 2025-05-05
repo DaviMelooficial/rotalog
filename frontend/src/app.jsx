@@ -3,6 +3,7 @@ import { LoginForm } from './components/Login/LoginForm';
 import { ForgotPassword } from './components/ForgotPassword/ForgotPassword';
 import { GlobalStyles } from './styles/GlobalStyles';
 import { Sidebar } from './components/Sidebar/Sidebar';
+import { UserManagement } from './pages/UserManagement'; // Importação da nova página
 
 function MainContent({ children }) {
   const location = useLocation();
@@ -31,6 +32,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginForm />} />
           <Route path="/recuperar-senha" element={<ForgotPassword />} />
+          <Route path="/usuarios" element={<UserManagement />} /> {/* Nova rota */}
           <Route path="/" element={<Navigate to="/login" replace />} />
           {/* Outras rotas */}
         </Routes>

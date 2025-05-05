@@ -98,6 +98,17 @@ class AuthService:
         return cliente
     
     @staticmethod
+    def consult_user_by_query(cpf=None, email=None, name=None):
+        query = User.query
+        if cpf:
+            query = query.filter_by(cpf=cpf)
+        if email:
+            query = query.filter_by(email=email)
+        if name:
+            query = query.filter(User.name.ilike(f"%{name}%"))
+        return query.first()
+    
+    @staticmethod
     def list_users():
         return User.query.all()
     
@@ -123,9 +134,9 @@ class AuthService:
             raise Exception(f"Erro ao atualizar usuário: {str(e)}")
     
     @staticmethod
-    def disable_user(cpf):
+    def disable_user(id):
 
-        user = User.query.filter_by(cpf=cpf).first()
+        user = User.query.filter_by(id=id).first()
         if not user:
             raise ValueError("usuário não encontrado")
         

@@ -8,7 +8,7 @@ import { useState } from 'react';
 
 const sidebarItems = [
   { label: 'Home', icon: <FiHome />, to: '/home' },
-  { label: 'Usuário', icon: <FiUser />, to: '/usuario' },
+  { label: 'Usuário', icon: <FiUser />, to: '/usuarios' },
   { label: 'Rotas', icon: <FiMap />, to: '/rotas' },
   { label: 'Entregas', icon: <FiPackage />, to: '/entregas' },
   { label: 'Clientes', icon: <FiUsers />, to: '/clientes' },
