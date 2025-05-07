@@ -55,7 +55,17 @@ def consultar_cliente(cnpj):
 def listar_clientes():
     return Cliente.query.all()
 
-def atualizar_cliente(cnpj, dados):
+def atualizar_cliente(cnpj, dados, user_password=None):
+    # Authentication check
+    from ..models.user import User
+    if not user_password:
+        raise ValueError("Senha do usuário é obrigatória para atualizar cliente")
+
+    # Verify user exists and password is correct
+    user = User.query.filter_by(id=dados.get('user_id')).first()
+    if not user or not user.check_password(user_password):
+        raise ValueError("Senha inválida")
+
     # Busca o cliente
     cliente = Cliente.query.filter_by(cnpj=cnpj).first()
     if not cliente:
@@ -83,6 +93,26 @@ def atualizar_cliente(cnpj, dados):
         db.session.rollback()
         raise Exception(f"Falha ao atualizar cliente: {str(e)}")
 
+def ativar_cliente(cnpj):
+    cliente = Cliente.query.filter_by(cnpj=cnpj).first()
+    if not cliente:
+        raise ValueError("Cliente não encontrado")
+
+    # Verifica se o cliente já está ativo (status True)
+    if  cliente.status == "ATIVO":
+        raise ValueError("Cliente já está ativo")
+
+    cliente.status ="ATIVO"  # Exclusão lógica (cliente ativo)
+
+    #criar bloco para que ele seja impossibilitado de ser usado em formação de rotas.
+
+    try:
+        db.session.commit()  # Persiste as alterações no banco
+        return cliente  # Retorna o cliente com as alterações feitas
+    except Exception as e:
+        db.session.rollback()  # Desfaz as alterações caso ocorra erro
+        raise Exception(f"Falha ao ativar cliente: {str(e)}")
+    
 def desativar_cliente(cnpj):
     cliente = Cliente.query.filter_by(cnpj=cnpj).first()
     if not cliente:

@@ -4,6 +4,7 @@ from flask import request, jsonify, url_for
 from flask_mail import Message
 from ..extensions import mail
 import random, string, secrets
+from datetime import datetime, timedelta
 
 class AuthService:
     @staticmethod
@@ -84,6 +85,88 @@ class AuthService:
         if not user or not user.check_password(password):
             return None, 'Invalid credentials'
         return user, None
+    
+    @staticmethod
+    def forgot_password(cpf):
+        user = User.query.filter_by(cpf=cpf).first()
+        if not user:
+            raise ValueError("Usuário não encontrado")
+
+        # Gera token seguro e define expiração
+        reset_token = secrets.token_urlsafe(32)
+        expiration = datetime.utcnow() + timedelta(hours=1)
+        
+        # Atualiza o usuário com o token
+        user.reset_token = reset_token
+        user.reset_token_expires = expiration
+
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise Exception(f"Erro ao gerar token de redefinição: {str(e)}")
+
+        # Gera o link de reset (assumindo que a aplicação roda na porta 5000)
+        reset_link = f"http://localhost:5000/reset-password/{reset_token}"
+
+        try:
+            msg = Message(
+                subject="Redefinição de Senha - Rotalog",
+                sender=("Rotalog System", "noreply@rotalog.com"),
+                recipients=[user.email],
+                body=f"""Olá {user.name},
+
+            Recebemos uma solicitação para redefinir sua senha.
+            Para criar uma nova senha, acesse o link abaixo:
+
+            {reset_link}
+
+            Este link é válido por 1 hora.
+            Se você não solicitou esta redefinição, ignore este email.
+
+            Atenciosamente,
+            Equipe Rotalog""",
+                html=f"""
+                <html>
+                    <body>
+                        <h2>Redefinição de Senha - Rotalog</h2>
+                        <p>Olá {user.name},</p>
+                        <p>Recebemos uma solicitação para redefinir sua senha.</p>
+                        <p>Para criar uma nova senha, clique no link abaixo:</p>
+                        <p><a href="{reset_link}">Redefinir minha senha</a></p>
+                        <p style="color: red;">Este link é válido por 1 hora.</p>
+                        <p>Se você não solicitou esta redefinição, ignore este email.</p>
+                        <br>
+                        <p>Atenciosamente,<br>Equipe Rotalog</p>
+                    </body>
+                </html>
+                """
+            )
+            # Adiciona headers importantes
+            msg.extra_headers = {
+                "List-Unsubscribe": f"<mailto:unsubscribe@rotalog.com?subject=unsubscribe>",
+                "Precedence": "bulk"
+            }
+            mail.send(msg)
+            return True
+        except Exception as e:
+            raise Exception(f"Erro ao enviar e-mail: {str(e)}")
+
+    @staticmethod
+    def reset_password(token, new_password):
+        #Redefine a senha do usuário usando um token de redefinição.
+        user = User.query.filter_by(reset_token=token).first()
+        if not user:
+            raise ValueError("Token inválido ou expirado")
+
+        try:
+            user.set_password(new_password)
+            user.reset_token = None  # Limpa o token após a redefinição da senha
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()
+            raise Exception(f"Erro ao redefinir senha: {str(e)}")
 
     @staticmethod
     def consult_user(cpf):
@@ -134,9 +217,9 @@ class AuthService:
             raise Exception(f"Erro ao atualizar usuário: {str(e)}")
     
     @staticmethod
-    def disable_user(id):
+    def disable_user(cpf):
 
-        user = User.query.filter_by(id=id).first()
+        user = User.query.filter_by(cpf=cpf).first()
         if not user:
             raise ValueError("usuário não encontrado")
         
@@ -153,57 +236,21 @@ class AuthService:
             raise Exception(f"Erro ao deletar cliente: {str(e)}")
         
     @staticmethod
-    def forgot_password(email):
-        user = User.query.filter_by(email=email).first()
-        if not user:
-            raise ValueError("Email não encontrado")
+    def reactivate_user(cpf):
 
-        # Gera nova senha aleatória
-        new_password = AuthService.generate_password()
+        user = User.query.filter_by(cpf=cpf).first()
+        if not user:
+            raise ValueError("usuário não encontrado")
         
-        # Atualiza a senha do usuário
-        user.set_password(new_password)
+        if user.status == 'ACTIVE':
+            raise ValueError("usuário já está ativo")
+        
+        user.status = 'ACTIVE'
 
         try:
             db.session.commit()
         except Exception as e:
             db.session.rollback()
-            raise Exception(f"Erro ao atualizar senha: {str(e)}")
+            raise Exception(f"Erro ao ativar cliente: {str(e)}")
 
-        try:
-            msg = Message(
-                subject="Nova Senha - Rotalog",
-                sender=("Rotalog System", "rotalog00@gmail.com"),
-                recipients=[email],
-                body=f"""Olá {user.name},
 
-Conforme solicitado, sua senha foi redefinida.
-Sua nova senha é: {new_password}
-
-Por favor, altere esta senha após seu próximo login por motivos de segurança.
-
-Atenciosamente,
-Equipe Rotalog""",
-                html=f"""
-                <html>
-                    <body>
-                        <h2>Nova Senha - Rotalog</h2>
-                        <p>Olá {user.name},</p>
-                        <p>Conforme solicitado, sua senha foi redefinida.</p>
-                        <p><strong>Sua nova senha é:</strong> {new_password}</p>
-                        <p style="color: red;"><strong>Importante:</strong> Por favor, altere esta senha após seu próximo login por motivos de segurança.</p>
-                        <br>
-                        <p>Atenciosamente,<br>Equipe Rotalog</p>
-                    </body>
-                </html>
-                """
-            )
-            # Adiciona headers importantes
-            msg.extra_headers = {
-                "List-Unsubscribe": f"<mailto:unsubscribe@rotalog.com?subject=unsubscribe>",
-                "Precedence": "bulk"
-            }
-            mail.send(msg)
-            return True
-        except Exception as e:
-            raise Exception(f"Erro ao enviar e-mail: {str(e)}")

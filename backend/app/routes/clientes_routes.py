@@ -44,48 +44,7 @@ def endpoint_consultar_cliente(cnpj):
         }), 200
     except ValueError as e:
         return jsonify({"erro": str(e)}), 404
-
-#ENDPOINT PARA ATUALIZAR CLIENTE
-@clientes_bp.route('/atualizar_cliente/<string:cnpj>', methods=['PUT'])
-def endpoint_atualizar_cliente(cnpj):
-    try:
-        dados = request.get_json()
-
-        if not dados:
-            return jsonify({"erro": "Nenhum dado fornecido para atualização"}), 400
-
-        # Chama a função de serviço
-        cliente_atualizado = atualizar_cliente(cnpj, dados)
-
-        # Resposta com os campos atualizados
-        return jsonify({
-            "mensagem": "Cliente atualizado com sucesso",
-            "cnpj": cliente_atualizado.cnpj,
-            "campos_alterados": list(dados.keys())
-        }), 200
-
-    except ValueError as e:
-        return jsonify({"erro": str(e)}), 404  # Cliente não encontrado ou dados inválidos
-
-    except Exception as e:
-        return jsonify({"erro": f"Falha na atualização: {str(e)}"}),     500
     
-
-#ENDPOINT PARA DESATIVAR CLIENTE:
-@clientes_bp.route('/desativar_cliente/<string:cnpj>', methods=['PATCH'])
-def endpoint_desativar_cliente(cnpj):
-    try:
-        cliente = desativar_cliente(cnpj)  # Chama a função para desativar o cliente
-        return jsonify({
-            "mensagem": f"Cliente {cliente.razao_social} desativado com sucesso.",
-            "cnpj": cliente.cnpj,
-            "status": cliente.status
-        }), 200  # Retorna o cliente com o status e cadastro travado
-    except ValueError as e:
-        return jsonify({"erro": str(e)}), 400  # Retorna erro se cliente não encontrado ou já inativo
-    except Exception as e:
-        return jsonify({"erro": str(e)}), 500  # Retorna erro genérico se houver falha no processo
-
 # ENDPOINT PARA LISTAR TODOS OS CLIENTES
 @clientes_bp.route('/listar_clientes', methods=['GET'])
 def endpoint_listar_clientes():
@@ -111,4 +70,52 @@ def endpoint_listar_clientes():
 
     except Exception as e:
         return jsonify({"erro": f"Falha ao listar clientes: {str(e)}"}), 500
+
+#ENDPOINT PARA ATUALIZAR CLIENTE
+@clientes_bp.route('/atualizar_cliente/<string:cnpj>', methods=['PUT'])
+def endpoint_atualizar_cliente(cnpj):
+    try:
+        dados = request.get_json()
+
+        if not dados:
+            return jsonify({"erro": "Nenhum dado fornecido para atualização"}), 400
+        
+        # Verifica se a senha foi fornecida
+        user_password = dados.pop('password', None)
+        if not user_password:
+            return jsonify({"erro": "Senha do usuário é obrigatória"}), 400
+
+        # Chama a função de serviço com autenticação
+        cliente_atualizado = atualizar_cliente(cnpj, dados, user_password)
+
+        # Resposta com os campos atualizados
+        return jsonify({
+            "mensagem": "Cliente atualizado com sucesso",
+            "cnpj": cliente_atualizado.cnpj,
+            "campos_alterados": [campo for campo in dados.keys() if campo != 'user_id']
+        }), 200
+
+    except ValueError as e:
+        return jsonify({"erro": str(e)}), 401 if "Senha inválida" in str(e) else 404
+
+    except Exception as e:
+        return jsonify({"erro": f"Falha na atualização: {str(e)}"}), 500
+    
+
+#ENDPOINT PARA DESATIVAR CLIENTE:
+@clientes_bp.route('/desativar_cliente/<string:cnpj>', methods=['PATCH'])
+def endpoint_desativar_cliente(cnpj):
+    try:
+        cliente = desativar_cliente(cnpj)  # Chama a função para desativar o cliente
+        return jsonify({
+            "mensagem": f"Cliente {cliente.razao_social} desativado com sucesso.",
+            "cnpj": cliente.cnpj,
+            "status": cliente.status
+        }), 200  # Retorna o cliente com o status e cadastro travado
+    except ValueError as e:
+        return jsonify({"erro": str(e)}), 400  # Retorna erro se cliente não encontrado ou já inativo
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500  # Retorna erro genérico se houver falha no processo
+
+
 
