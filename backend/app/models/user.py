@@ -1,5 +1,6 @@
 from ..extensions import db
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -13,9 +14,11 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
     reset_token = db.Column(db.String(128), nullable=True)  # Novo campo para o token
+    reset_token_expires = db.Column(db.DateTime, nullable=True)  # Nova coluna para expiração do token
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
+        self.last_password_change = datetime.now()  # Atualiza a data de alteração da senha
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)

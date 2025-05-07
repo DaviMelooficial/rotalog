@@ -35,36 +35,6 @@ def login():
             "message": str(e)
         }), 500
     
-@auth_bp.route('/reset_password', methods=['POST'])
-def reset_password():
-    try:
-        data = request.get_json()
-        if not data or 'new_password' not in data or 'token' not in data:
-            return jsonify({"error": "Dados inválidos"}), 400
-
-        new_password = data['new_password']
-        token = data['token']
-        user = User.query.filter_by(reset_token=token).first()
-
-        if not user:
-            return jsonify({"error": "Token inválido ou expirado"}), 400
-
-        user.set_password(new_password)
-        user.reset_token = None  # Limpa o token após a redefinição da senha
-        try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            raise Exception({"error": "Erro ao redefinir a senha"})
-
-        return jsonify({"message": "Senha redefinida com sucesso"}), 200
-
-    except Exception as e:
-        return jsonify({
-            "error": "Erro no servidor",
-            "message": str(e)
-        }), 500
-
 @auth_bp.route('/register', methods=['POST'])
 def user_register():
     try:
@@ -103,6 +73,48 @@ def user_register():
                 "position": new_user.position
             }
         }), 201
+
+    except Exception as e:
+        return jsonify({
+            "error": "Erro no servidor",
+            "message": str(e)
+        }), 500
+
+@auth_bp.route('/forgot_password', methods=['POST'])
+def forgot_password():
+    try:
+        data = request.get_json()
+        if not data or 'cpf' not in data:
+            return jsonify({"error": "CPF é obrigatório"}), 400
+
+        cpf = data['cpf']
+        
+        try:
+            AuthService.forgot_password(cpf)
+            return jsonify({"message": "Um link para redefinição de senha foi enviado para seu email"}), 200
+        except ValueError as e:
+            return jsonify({"error": str(e)}), 404
+
+    except Exception as e:
+        return jsonify({
+            "error": "Erro no servidor",
+            "message": str(e)
+        }), 500
+
+@auth_bp.route('/reset_password/<token>', methods=['POST'])
+def reset_password(token):
+    try:
+        data = request.get_json()
+        if not data or 'new_password' not in data:
+            return jsonify({"error": "Nova senha não fornecida"}), 400
+
+        new_password = data['new_password']
+        
+        try:
+            AuthService.reset_password(token, new_password)
+            return jsonify({"message": "Senha redefinida com sucesso"}), 200
+        except ValueError as e:
+            return jsonify({"error": str(e)}), 400
 
     except Exception as e:
         return jsonify({
@@ -190,34 +202,22 @@ def user_update(cpf):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-    
-@auth_bp.route('/disable_user/<string:id>', methods=['PUT'])
-def user_disable(id):
+@auth_bp.route('/disable_user/<string:cpf>', methods=['PATCH'])
+def user_disable(cpf):
     try:
-        AuthService.disable_user(id)
-        return jsonify({"message": "Usuário cancelado com sucesso"}), 200
+        AuthService.disable_user(cpf)
+        return jsonify({"message": "Usuário desativado com sucesso"}), 200
     except ValueError as e:
         return jsonify({"error": str(e)}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-@auth_bp.route('/forgot_password', methods=['POST'])
-def forgot_password():
+    
+@auth_bp.route('/enable_user/<string:cpf>', methods=['PATCH'])    
+def user_enable(cpf):
     try:
-        data = request.get_json()
-        if not data or 'email' not in data:
-            return jsonify({"error": "Email é obrigatório"}), 400
-
-        email = data['email']
-        
-        try:
-            AuthService.forgot_password(email)
-            return jsonify({"message": "Uma nova senha foi enviada para seu email"}), 200
-        except ValueError as e:
-            return jsonify({"error": str(e)}), 404
-
+        AuthService.reactivate_user(cpf)
+        return jsonify({"message": "Usuário reativado com sucesso"}), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 404
     except Exception as e:
-        return jsonify({
-            "error": "Erro no servidor",
-            "message": str(e)
-        }), 500
+        return jsonify({"error": str(e)}), 500
